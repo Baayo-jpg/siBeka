@@ -1,25 +1,27 @@
 package com.example.sibeka.ui.level
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.model.ModeKuis
+import com.example.sibeka.ui.components.*
 import com.example.sibeka.ui.theme.*
 
 data class MenuKuisItem(
@@ -38,161 +40,80 @@ fun LevelSelectScreen(
 ) {
     val repository = SiBekaApp.instance.container.repository
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
+    val totalKoin by repository.dataStore.totalKoin.collectAsState(initial = 100)
+    val totalBintang by repository.dataStore.totalBintang.collectAsState(initial = 0)
     var namaHabitat by remember { mutableStateOf("Habitat") }
 
     LaunchedEffect(habitatId) {
-        val h = repository.getHabitatById(habitatId)
-        namaHabitat = h?.namaHabitat ?: "Habitat"
+        namaHabitat = repository.getHabitatById(habitatId)?.namaHabitat ?: "Habitat"
     }
 
     val daftarMode = listOf(
-        MenuKuisItem(
-            mode = ModeKuis.SUSUN_HURUF,
-            judul = "Susun Huruf",
-            emoji = "🔤",
-            deskripsi = "Susun huruf teracak menjadi nama flora atau fauna yang tepat",
-            warna = HijauUtama
-        ),
-        MenuKuisItem(
-            mode = ModeKuis.PASANGKAN,
-            judul = "Pasangkan Gambar",
-            emoji = "🔗",
-            deskripsi = "Cocokkan hewan/tumbuhan dengan pasangan makanannya atau karakternya",
-            warna = BiruLaut
-        ),
-        MenuKuisItem(
-            mode = ModeKuis.TEBAK_SILUET,
-            judul = "Tebak Siluet",
-            emoji = "🕵️",
-            deskripsi = "Kenali bayangan hitam misterius fauna & flora endemik",
-            warna = CoklatKayu
-        ),
-        MenuKuisItem(
-            mode = ModeKuis.POTONGAN_GAMBAR,
-            judul = "Potongan Gambar",
-            emoji = "🍃",
-            deskripsi = "Buka helai daun penutup seminimal mungkin untuk menebak gambarnya",
-            warna = OranjeAksen
-        ),
-        MenuKuisItem(
-            mode = ModeKuis.TEBAK_SUARA,
-            judul = "Tebak Suara",
-            emoji = "🔊",
-            deskripsi = "Dengarkan suara asli hewan dan tebak nama faunanya",
-            warna = Color(0xFF6A1B9A)
-        )
+        MenuKuisItem(ModeKuis.SUSUN_HURUF, "Susun Huruf", "🔤", "Susun huruf teracak menjadi nama flora atau fauna yang tepat", HijauUtama),
+        MenuKuisItem(ModeKuis.PASANGKAN, "Pasangkan Gambar", "🔗", "Cocokkan hewan/tumbuhan dengan pasangan makanannya atau karakternya", BiruLaut),
+        MenuKuisItem(ModeKuis.TEBAK_SILUET, "Tebak Siluet", "🕵️", "Kenali bayangan hitam misterius fauna & flora endemik", CoklatKayu),
+        MenuKuisItem(ModeKuis.POTONGAN_GAMBAR, "Potongan Gambar", "🍃", "Buka sedikit potongan penutup untuk menebak gambarnya", OranjeAksen),
+        MenuKuisItem(ModeKuis.TEBAK_SUARA, "Tebak Suara", "🔊", "Dengarkan suara asli hewan dan tebak nama faunanya", WarnaRawa)
     )
 
     Scaffold(
+        containerColor = LatarKrem,
         topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = PutihBersih,
-                shadowElevation = 4.dp
+            Row(
+                Modifier.fillMaxWidth().background(LatarKrem).statusBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    IconButton(
-                        onClick = {
-                            sfxPlayer.playClick()
-                            onKembali()
-                        },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(AbuMuda)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = HitamLembut
-                        )
-                    }
-
-                    Column {
-                        Text(
-                            text = "Jalur Level: $namaHabitat",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = HijauTua
-                        )
-                        Text(
-                            text = "Pilih Tantangan Kuis",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = AbuTua
-                        )
-                    }
+                TombolIkonBulat(Icons.AutoMirrored.Filled.ArrowBack, "Kembali", { sfxPlayer.playClick(); onKembali() })
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ChipBintang(totalBintang)
+                    ChipKoin(totalKoin)
                 }
             }
         }
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF1F8E9))
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            Modifier.fillMaxSize().padding(innerPadding),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(namaHabitat, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                    Text("Dengar, lihat, dan temukan keajaibannya.", fontSize = 13.sp, color = AbuTua)
+                }
+            }
+            item {
+                Text(
+                    "PILIH TANTANGAN KUIS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                    color = AbuTua, letterSpacing = 0.6.sp, modifier = Modifier.padding(top = 6.dp)
+                )
+            }
             items(daftarMode.size) { index ->
                 val item = daftarMode[index]
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            sfxPlayer.playClick()
-                            onMulaiModeKuis(habitatId, item.mode)
-                        }
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
+                KartuSiBeka(
+                    Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = PutihBersih)
+                    onClick = { sfxPlayer.playClick(); onMulaiModeKuis(habitatId, item.mode) }
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        Modifier.fillMaxWidth().padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(CircleShape)
-                                .background(item.warna.copy(alpha = 0.15f)),
+                            Modifier.size(54.dp).clip(RoundedCornerShape(16.dp)).background(item.warna.copy(alpha = 0.14f)),
                             contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = item.emoji, fontSize = 28.sp)
+                        ) { Text(item.emoji, fontSize = 26.sp) }
+
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(item.judul, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                            Text(item.deskripsi, fontSize = 12.sp, lineHeight = 16.sp, color = AbuTua)
                         }
 
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = item.judul,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = item.warna
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = item.deskripsi,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = AbuTua,
-                                lineHeight = 16.sp
-                            )
-                        }
-
-                        Surface(
-                            shape = CircleShape,
-                            color = item.warna,
-                            modifier = Modifier.size(34.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(text = "▶", color = PutihBersih, fontSize = 14.sp)
-                            }
+                        Box(Modifier.size(34.dp).clip(CircleShape).background(HijauTua), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.PlayArrow, "Mulai", tint = PutihBersih, modifier = Modifier.size(20.dp))
                         }
                     }
                 }

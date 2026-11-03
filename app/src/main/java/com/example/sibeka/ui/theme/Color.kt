@@ -53,3 +53,9 @@ val WarnaGunung      = Color(0xFF697E78)
 val LatarKrem        = Color(0xFFFFF9EC)
 val GarisKartu       = Color(0xFFE7E2CD)
 val MaskotLatar      = Color(0xFFEEF3DE)
+
+// ── Tambahan untuk desain Figma ────────────────────────────────────────────
+val BayanganTombol   = Color(0xFF0B3226)   // sisi bawah tombol hijau (efek tebal)
+val BayanganKartu    = Color(0xFFDAD3B6)   // sisi bawah tombol sekunder krem
+val TrackProgres     = Color(0xFFE4E7D0)   // segmen progres belum terisi
+val KuningPlay       = Color(0xFFFFD25A)   // tombol play audio
