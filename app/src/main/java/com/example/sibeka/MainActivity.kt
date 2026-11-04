@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -69,12 +70,8 @@ class MainActivity : ComponentActivity() {
                             onPilihHabitat = { habitatId ->
                                 navController.navigate("level/$habitatId")
                             },
-                            onBukaKoleksi = {
-                                navController.navigate("koleksi")
-                            },
-                            onBukaToko = {
-                                navController.navigate("toko")
-                            }
+                            onBukaKoleksi = { navController.keTab("koleksi") },
+                            onBukaToko = { navController.keTab("toko") }
                         )
                     }
 
@@ -119,18 +116,28 @@ class MainActivity : ComponentActivity() {
                     // 6. Buku Koleksi
                     composable("koleksi") {
                         KoleksiScreen(
-                            onKembali = { navController.popBackStack() }
+                            onBukaPeta = { navController.keTab("peta") },
+                            onBukaToko = { navController.keTab("toko") }
                         )
                     }
 
                     // 7. Toko Maskot
                     composable("toko") {
                         TokoScreen(
-                            onKembali = { navController.popBackStack() }
+                            onBukaPeta = { navController.keTab("peta") },
+                            onBukaKoleksi = { navController.keTab("koleksi") }
                         )
                     }
                 }
             }
         }
+    }
+}
+
+/** Pindah antar tab bawah (Peta / Koleksi / Toko) tanpa menumpuk back stack. */
+private fun NavController.keTab(route: String) {
+    navigate(route) {
+        popUpTo("peta") { inclusive = false }
+        launchSingleTop = true
     }
 }

@@ -1,326 +1,323 @@
 package com.example.sibeka.ui.koleksi
 
-import androidx.compose.animation.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.db.ObjekEntity
+import com.example.sibeka.ui.components.*
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.AssetImageLoader
 
 @Composable
 fun KoleksiScreen(
-    onKembali: () -> Unit
+    onBukaPeta: () -> Unit,
+    onBukaToko: () -> Unit
 ) {
     val repository = SiBekaApp.instance.container.repository
+    val dataStore = repository.dataStore
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
     val audioManager = SiBekaApp.instance.container.audioManager
 
     val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
     val koleksiList by repository.getAllKoleksi().collectAsState(initial = emptyList())
     val collectedIds = remember(koleksiList) { koleksiList.map { it.idObjek }.toSet() }
+    val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
+    val totalBintang by dataStore.totalBintang.collectAsState(initial = 0)
 
     var selectedHabitatId by remember { mutableStateOf("SEMUA") }
     var allObjek by remember { mutableStateOf<List<ObjekEntity>>(emptyList()) }
-    var selectedObjekForDetail by remember { mutableStateOf<ObjekEntity?>(null) }
+    var selectedObjek by remember { mutableStateOf<ObjekEntity?>(null) }
 
     LaunchedEffect(Unit) {
         val list = mutableListOf<ObjekEntity>()
-        val habs = listOf("HH", "LT", "SG", "RW", "GN")
-        for (h in habs) {
+        for (h in listOf("HH", "LT", "SG", "RW", "GN")) {
             list.addAll(repository.getSoalByHabitat(h, 15))
         }
         allObjek = list
     }
 
     val filteredObjek = remember(selectedHabitatId, allObjek) {
-        if (selectedHabitatId == "SEMUA") allObjek
-        else allObjek.filter { it.idHabitat == selectedHabitatId }
+        if (selectedHabitatId == "SEMUA") allObjek else allObjek.filter { it.idHabitat == selectedHabitatId }
+    }
+    val namaHabitatDari = { id: String -> habitats.firstOrNull { it.id == id }?.namaHabitat ?: "" }
+
+    BackHandler(enabled = selectedObjek != null) { selectedObjek = null }
+
+    val detail = selectedObjek
+    if (detail != null) {
+        DetailKoleksi(
+            objek = detail,
+            namaHabitat = namaHabitatDari(detail.idHabitat),
+            totalKoin = totalKoin,
+            totalBintang = totalBintang,
+            onKembali = { sfxPlayer.playClick(); selectedObjek = null },
+            onPlayAudio = {
+                if (detail.fileSuaraPath.isNotBlank()) audioManager.playSuaraFauna(detail.fileSuaraPath)
+            }
+        )
+        return
     }
 
+    val total = allObjek.size.coerceAtLeast(1)
+    val ditemukan = allObjek.count { it.idObjek in collectedIds }
+    val persen = ditemukan * 100 / total
+
     Scaffold(
+        containerColor = LatarKrem,
         topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = PutihBersih,
-                shadowElevation = 4.dp
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                sfxPlayer.playClick()
-                                onKembali()
-                            },
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(AbuMuda)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Kembali",
-                                tint = HitamLembut
-                            )
-                        }
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Buku Koleksi Flora & Fauna",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = HijauTua
-                            )
-                            Text(
-                                text = "Terkumpul: ${collectedIds.size} dari 75 Spesies",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = AbuTua
-                            )
-                        }
-                    }
-
-                    // Filter Tab Habitat
-                    ScrollableTabRow(
-                        selectedTabIndex = if (selectedHabitatId == "SEMUA") 0 else habitats.indexOfFirst { it.id == selectedHabitatId } + 1,
-                        edgePadding = 0.dp,
-                        containerColor = Color.Transparent,
-                        divider = {}
-                    ) {
-                        Tab(
-                            selected = selectedHabitatId == "SEMUA",
-                            onClick = { selectedHabitatId = "SEMUA" },
-                            text = { Text("Semua") }
-                        )
-                        habitats.forEach { h ->
-                            Tab(
-                                selected = selectedHabitatId == h.id,
-                                onClick = { selectedHabitatId = h.id },
-                                text = { Text(h.namaHabitat) }
-                            )
-                        }
-                    }
-                }
-            }
+            HeaderJelajahAlam { ChipBintang(totalBintang); ChipKoin(totalKoin) }
+        },
+        bottomBar = {
+            SiBekaBottomBar(
+                terpilih = TabUtama.KOLEKSI,
+                onPeta = { sfxPlayer.playClick(); onBukaPeta() },
+                onKoleksi = {},
+                onToko = { sfxPlayer.playClick(); onBukaToko() }
+            )
         }
     ) { innerPadding ->
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF1F8E9))
-                .padding(innerPadding)
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text("Buku Koleksiku", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                    Text("Setiap penemuan punya cerita.", fontSize = 13.sp, color = AbuTua)
+                }
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                KartuSiBeka(Modifier.fillMaxWidth(), container = HijauBenarMuda, borderColor = HijauBenarMuda, shape = RoundedCornerShape(18.dp)) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("$ditemukan dari $total spesies ditemukan", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                            Text("$persen%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                        }
+                        Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(PutihBersih.copy(alpha = 0.7f))) {
+                            Box(Modifier.fillMaxWidth(persen / 100f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(HijauTua))
+                        }
+                    }
+                }
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    item {
+                        ChipFilter("Semua · $ditemukan", selectedHabitatId == "SEMUA") { selectedHabitatId = "SEMUA" }
+                    }
+                    items(habitats) { h ->
+                        val n = allObjek.count { it.idHabitat == h.id && it.idObjek in collectedIds }
+                        ChipFilter("${h.namaHabitat} · $n", selectedHabitatId == h.id) { selectedHabitatId = h.id }
+                    }
+                }
+            }
             items(filteredObjek) { item ->
-                val isUnlocked = collectedIds.contains(item.idObjek)
+                val terbuka = collectedIds.contains(item.idObjek)
                 KoleksiGridItem(
                     objek = item,
-                    isUnlocked = isUnlocked,
+                    namaHabitat = namaHabitatDari(item.idHabitat),
+                    terbuka = terbuka,
                     onClick = {
-                        if (isUnlocked) {
-                            sfxPlayer.playClick()
-                            selectedObjekForDetail = item
-                        } else {
-                            sfxPlayer.playSalah()
-                        }
+                        if (terbuka) { sfxPlayer.playClick(); selectedObjek = item } else sfxPlayer.playSalah()
                     }
                 )
             }
         }
     }
+}
 
-    // Modal Detail Kartu Koleksi
-    selectedObjekForDetail?.let { objek ->
-        DetailKoleksiDialog(
-            objek = objek,
-            onDismiss = { selectedObjekForDetail = null },
-            onPlayAudio = {
-                if (objek.fileSuaraPath.isNotBlank()) {
-                    audioManager.playSuaraFauna(objek.fileSuaraPath)
-                }
-            }
-        )
+@Composable
+private fun ChipFilter(label: String, terpilih: Boolean, onClick: () -> Unit) {
+    val bentuk = RoundedCornerShape(50)
+    Box(
+        Modifier.clip(bentuk)
+            .background(if (terpilih) HijauTua else PutihBersih)
+            .border(1.dp, if (terpilih) HijauTua else GarisKartu, bentuk)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(label, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = if (terpilih) PutihBersih else HijauTua)
     }
 }
 
 @Composable
-fun KoleksiGridItem(
-    objek: ObjekEntity,
-    isUnlocked: Boolean,
-    onClick: () -> Unit
-) {
+fun KoleksiGridItem(objek: ObjekEntity, namaHabitat: String, terbuka: Boolean, onClick: () -> Unit) {
     val context = LocalContext.current
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(130.dp)
-            .clickable(onClick = onClick)
-            .shadow(if (isUnlocked) 3.dp else 1.dp, RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isUnlocked) PutihBersih else Color(0xFFE0E0E0)
-        )
+    KartuSiBeka(
+        Modifier.fillMaxWidth(),
+        container = if (terbuka) PutihBersih else AbuMuda,
+        borderColor = if (terbuka) GarisKartu else GarisKartu.copy(alpha = 0.6f),
+        shape = RoundedCornerShape(18.dp),
+        onClick = onClick
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (isUnlocked) {
-                AsyncImage(
-                    model = AssetImageLoader.buildAssetRequest(context, objek.gambarUtamaPath, 160, 160),
-                    contentDescription = objek.namaObjek,
-                    modifier = Modifier
-                        .size(68.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Fit
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(
+                Modifier.fillMaxWidth().height(92.dp).clip(RoundedCornerShape(12.dp))
+                    .background(if (terbuka) HijauBenarMuda else MaskotLatar),
+                contentAlignment = Alignment.Center
+            ) {
+                if (terbuka) {
+                    AsyncImage(
+                        model = AssetImageLoader.buildAssetRequest(context, objek.gambarUtamaPath, 240, 240),
+                        contentDescription = objek.namaObjek,
+                        modifier = Modifier.fillMaxSize().padding(4.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    Icon(Icons.Default.Lock, "Terkunci", tint = AbuSedang, modifier = Modifier.size(30.dp))
+                }
+            }
+            Column(Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
                 Text(
-                    text = objek.namaObjek,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = HitamLembut,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
+                    if (terbuka) objek.namaObjek else "Belum ditemukan",
+                    fontSize = 13.sp, fontWeight = FontWeight.ExtraBold,
+                    color = if (terbuka) HijauTua else AbuTua, maxLines = 1
                 )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Terkunci",
-                    tint = AbuSedang,
-                    modifier = Modifier.size(36.dp)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "???",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = AbuSedang,
-                    fontWeight = FontWeight.Bold
+                    if (terbuka) namaHabitat else "Menangkan kuis untuk membuka",
+                    fontSize = 10.sp, color = AbuTua, maxLines = 1
                 )
             }
         }
     }
 }
 
+// ── Detail koleksi (layar penuh, menggantikan dialog) ───────────────────────
 @Composable
-fun DetailKoleksiDialog(
+private fun DetailKoleksi(
     objek: ObjekEntity,
-    onDismiss: () -> Unit,
+    namaHabitat: String,
+    totalKoin: Int,
+    totalBintang: Int,
+    onKembali: () -> Unit,
     onPlayAudio: () -> Unit
 ) {
     val context = LocalContext.current
 
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(12.dp, RoundedCornerShape(24.dp)),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = PutihBersih)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+    Scaffold(
+        containerColor = LatarKrem,
+        topBar = {
+            Row(
+                Modifier.fillMaxWidth().background(LatarKrem).statusBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    Modifier.clip(RoundedCornerShape(10.dp)).clickable(onClick = onKembali).padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Kartu Spesies Alam",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = HijauUtama
-                    )
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Tutup")
-                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Kembali", tint = HijauTua, modifier = Modifier.size(22.dp))
+                    Text("Buku Koleksi", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
                 }
-
-                // Gambar Besar
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ChipBintang(totalBintang); ChipKoin(totalKoin) }
+            }
+        },
+        bottomBar = {
+            Box(Modifier.fillMaxWidth().background(LatarKrem).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp)) {
+                TombolSekunder("Kembali ke Buku Koleksi", onClick = onKembali, icon = Icons.Outlined.MenuBook)
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Box(
+                Modifier.fillMaxWidth().height(210.dp).clip(RoundedCornerShape(24.dp)).background(HijauBenarMuda),
+                contentAlignment = Alignment.Center
+            ) {
                 AsyncImage(
-                    model = AssetImageLoader.buildAssetRequest(context, objek.gambarUtamaPath, 300, 300),
+                    model = AssetImageLoader.buildAssetRequest(context, objek.gambarUtamaPath, 600, 420),
                     contentDescription = objek.namaObjek,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                    modifier = Modifier.fillMaxSize().padding(12.dp),
                     contentScale = ContentScale.Fit
                 )
+                if (namaHabitat.isNotBlank()) {
+                    PillLabel(namaHabitat.uppercase(), Modifier.align(Alignment.TopStart).padding(12.dp), container = PutihBersih)
+                }
+            }
 
-                Text(
-                    text = objek.namaObjek,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = HijauTua,
-                    textAlign = TextAlign.Center
-                )
-
-                // Fakta Unik Card
-                Surface(
-                    color = HijauPucat,
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "💡 Tahukah Kamu?",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = CoklatTua,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = objek.faktaUnik,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = HitamLembut,
-                            lineHeight = 18.sp
-                        )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(objek.namaObjek, fontSize = 30.sp, lineHeight = 36.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                if (namaHabitat.isNotBlank()) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Icon(Icons.Outlined.Place, null, tint = BiruLaut, modifier = Modifier.size(15.dp))
+                        Text(namaHabitat, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BiruLaut)
                     }
                 }
             }
+
+            if (objek.fileSuaraPath.isNotBlank()) {
+                KartuSiBeka(Modifier.fillMaxWidth(), container = BiruPucat, borderColor = BiruPucat, shape = RoundedCornerShape(18.dp), onClick = onPlayAudio) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Box(Modifier.size(46.dp).clip(CircleShape).background(HijauTua), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.PlayArrow, "Putar", tint = PutihBersih, modifier = Modifier.size(26.dp))
+                        }
+                        Column(Modifier.weight(1f)) {
+                            Text("Dengarkan suaranya", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                            Text("Ketuk untuk memutar suara ${objek.namaObjek}", fontSize = 11.sp, color = BiruLaut, fontWeight = FontWeight.SemiBold)
+                        }
+                        Icon(Icons.AutoMirrored.Outlined.VolumeUp, null, tint = BiruLaut, modifier = Modifier.size(22.dp))
+                    }
+                }
+            }
+
+            KartuSiBeka(Modifier.fillMaxWidth(), container = KuningMuda, borderColor = KuningMuda, shape = RoundedCornerShape(18.dp)) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Icon(Icons.Outlined.Lightbulb, null, tint = CoklatTua, modifier = Modifier.size(18.dp))
+                        Text("Tahukah kamu?", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                    }
+                    Text(objek.faktaUnik, fontSize = 13.sp, lineHeight = 19.sp, color = HitamLembut)
+                }
+            }
+
+            BubbleSiBeka("${objek.namaObjek} sudah jadi teman barumu. Yuk, kumpulkan teman lainnya!")
+            Spacer(Modifier.height(4.dp))
         }
     }
 }
