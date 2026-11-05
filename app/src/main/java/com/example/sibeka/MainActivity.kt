@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -23,6 +25,7 @@ import com.example.sibeka.ui.splash.SplashScreen
 import com.example.sibeka.ui.theme.SiBekaTheme
 import com.example.sibeka.ui.toko.TokoScreen
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,26 +35,31 @@ class MainActivity : ComponentActivity() {
             SiBekaTheme {
                 val navController = rememberNavController()
                 val dataStore = SiBekaApp.instance.container.dataStore
+                val coroutineScope = rememberCoroutineScope()
 
-                NavHost(
-                    navController = navController,
-                    startDestination = "splash",
-                    modifier = Modifier.fillMaxSize()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    // 1. Splash Screen
-                    composable("splash") {
-                        SplashScreen(
-                            onSplashFinished = {
-                                // Cek apakah nama sudah pernah disimpan
-                                kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).run {
-                                    val nama = dataStore.namaPemain
-                                    navController.navigate("peta") {
-                                        popUpTo("splash") { inclusive = true }
+                    NavHost(
+                        navController = navController,
+                        startDestination = "splash",
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // 1. Splash Screen
+                        composable("splash") {
+                            SplashScreen(
+                                onSplashFinished = {
+                                    coroutineScope.launch {
+                                        val nama = dataStore.namaPemain.first()
+                                        val destination = if (nama.isBlank()) "sambutan" else "peta"
+                                        navController.navigate(destination) {
+                                            popUpTo("splash") { inclusive = true }
+                                        }
                                     }
                                 }
-                            }
-                        )
-                    }
+                            )
+                        }
 
                     // 2. Sambutan / Input Nama
                     composable("sambutan") {
@@ -132,6 +140,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 }
 
 /** Pindah antar tab bawah (Peta / Koleksi / Toko) tanpa menumpuk back stack. */

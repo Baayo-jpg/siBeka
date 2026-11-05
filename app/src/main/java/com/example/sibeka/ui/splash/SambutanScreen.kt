@@ -122,7 +122,7 @@ fun SambutanScreen(
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             FiturKecil(Icons.Outlined.Eco, "5 habitat")
-            FiturKecil(Icons.Outlined.Extension, "5 jenis kuis")
+            FiturKecil(Icons.Outlined.Extension, "3 jenis kuis")
             FiturKecil(Icons.Default.Star, "Banyak hadiah")
         }
         Text("Belajar sedikit, takjub banyak. Ayo berangkat!", fontSize = 11.sp, color = AbuTua)

@@ -18,15 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import app.rive.runtime.kotlin.RiveAnimationView
-import com.example.sibeka.R
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.db.HabitatEntity
 import com.example.sibeka.ui.components.*
@@ -94,7 +90,7 @@ fun PetaScreen(
                     Text("Halo, $namaPemain! Lima habitat, banyak teman baru.", fontSize = 13.sp, color = AbuTua)
                 }
             }
-            item { HabitatMapAnimation() }
+            item { HabitatMapBanner() }
             items(habitats) { habitat ->
                 HabitatCard(habitat = habitat, onClick = { sfxPlayer.playClick(); onPilihHabitat(habitat.id) })
             }
@@ -104,16 +100,31 @@ fun PetaScreen(
 }
 
 @Composable
-private fun HabitatMapAnimation() {
-    val context = LocalContext.current
+private fun HabitatMapBanner() {
     Box(
         Modifier.fillMaxWidth().height(240.dp).clip(RoundedCornerShape(24.dp))
             .background(MaskotLatar).border(1.dp, GarisKartu, RoundedCornerShape(24.dp))
+            .semantics { contentDescription = "Peta habitat Indonesia" },
+        contentAlignment = Alignment.Center
     ) {
-        AndroidView(
-            factory = { RiveAnimationView(context).apply { setRiveResource(R.raw.habitat_map) } },
-            modifier = Modifier.fillMaxSize().semantics { contentDescription = "Animasi peta habitat Indonesia" }
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("🗺️", fontSize = 48.sp)
+            Text(
+                text = "Peta Habitat Indonesia",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = HijauTua
+            )
+            Text(
+                text = "Jelajahi keanekaragaman hayati Nusantara!",
+                fontSize = 12.sp,
+                color = AbuTua
+            )
+        }
     }
 }
 

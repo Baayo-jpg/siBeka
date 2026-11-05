@@ -57,6 +57,7 @@ dependencies {
 
     // Coil — load gambar dari assets/ dengan memory management optimal
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 
     // DataStore — simpan progres & preferensi ringan (nama pemain, mute state)
     implementation(libs.datastore.preferences)
@@ -66,10 +67,6 @@ dependencies {
 
     // Splash Screen API
     implementation(libs.splashscreen)
-
-    // Rive habitat map animation
-    implementation(libs.rive.android)
-    implementation(libs.androidx.startup.runtime)
 
     // Testing
     testImplementation(libs.junit)

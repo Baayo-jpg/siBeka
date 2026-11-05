@@ -5,24 +5,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Backspace
-import androidx.compose.material.icons.automirrored.outlined.VolumeUp
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Eco
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.db.ObjekEntity
 import com.example.sibeka.data.model.ModeKuis
 import com.example.sibeka.data.model.StatusJawaban
@@ -54,20 +46,10 @@ private fun teksMode(mode: ModeKuis) = when (mode) {
         "Perhatikan gambarnya baik-baik, lalu pilih pasangan yang paling cocok.",
         "Pilih pasangan di atas"
     )
-    ModeKuis.TEBAK_SILUET -> TeksMode(
-        "Siapa di balik bayangan?", "Perhatikan bentuk tubuhnya.",
-        "Lihat bentuk tubuhnya. Siapa ya yang punya bayangan seperti itu?",
-        "Pilih jawaban di atas"
-    )
     ModeKuis.POTONGAN_GAMBAR -> TeksMode(
         "Buka sedikit, tebak cepat!", "Makhluk apakah yang bersembunyi ini?",
         "Buka potongan satu per satu. Makin sedikit yang dibuka, makin banyak poinnya!",
         "Pilih jawaban di atas"
-    )
-    ModeKuis.TEBAK_SUARA -> TeksMode(
-        "Suara siapakah itu?", "Dengarkan, lalu pilih hewan yang tepat.",
-        "Pasang telingamu! Kamu boleh mendengarkan lebih dari sekali.",
-        "Pilih hewan di atas"
     )
 }
 
@@ -159,9 +141,7 @@ fun KuisScreen(
             when (uiState.modeKuis) {
                 ModeKuis.SUSUN_HURUF -> SusunHurufView(uiState, currentSoal, viewModel)
                 ModeKuis.PASANGKAN -> PasangkanGambarView(uiState, currentSoal, viewModel)
-                ModeKuis.TEBAK_SILUET -> TebakSiluetView(uiState, currentSoal, viewModel)
                 ModeKuis.POTONGAN_GAMBAR -> PotonganGambarView(uiState, currentSoal, viewModel)
-                ModeKuis.TEBAK_SUARA -> TebakSuaraView(uiState, currentSoal, viewModel)
             }
 
             if (sudahJawab) {
@@ -315,45 +295,7 @@ private fun LabelKolom(teks: String) {
     Text(teks, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = AbuTua, letterSpacing = 0.6.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
 }
 
-// ── 3. Tebak Siluet ──────────────────────────────────────────────────────────
-
-@Composable
-fun TebakSiluetView(uiState: KuisUiState, currentSoal: ObjekEntity, viewModel: KuisViewModel) {
-    val context = LocalContext.current
-    val terungkap = uiState.statusJawaban != StatusJawaban.BELUM
-    val huruf = listOf("A", "B", "C", "D")
-
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Box(
-            Modifier.fillMaxWidth().height(230.dp).clip(RoundedCornerShape(24.dp)).background(HijauBenarMuda),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(Modifier.size(170.dp).clip(CircleShape).background(MaskotLatar))
-            AsyncImage(
-                model = AssetImageLoader.buildAssetRequest(context, currentSoal.gambarUtamaPath, 340, 340),
-                contentDescription = "Siluet",
-                colorFilter = if (!terungkap) ColorFilter.tint(HitamLembut, BlendMode.SrcIn) else null,
-                modifier = Modifier.fillMaxSize().padding(24.dp),
-                contentScale = ContentScale.Fit
-            )
-            PillLabel(
-                if (terungkap) currentSoal.namaObjek.uppercase() else "TEBAK SILUET",
-                Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp),
-                container = PutihBersih
-            )
-        }
-        uiState.opsiJawaban.forEachIndexed { i, opsi ->
-            OpsiBerhuruf(
-                huruf = huruf.getOrElse(i) { "?" },
-                teks = opsi.namaObjek,
-                status = statusOpsi(opsi, uiState, currentSoal),
-                onClick = { viewModel.pilihOpsiJawaban(opsi.idObjek) }
-            )
-        }
-    }
-}
-
-// ── 4. Potongan Gambar ───────────────────────────────────────────────────────
+// ── 3. Potongan Gambar ───────────────────────────────────────────────────────
 
 @Composable
 fun PotonganGambarView(uiState: KuisUiState, currentSoal: ObjekEntity, viewModel: KuisViewModel) {
@@ -405,73 +347,6 @@ fun PotonganGambarView(uiState: KuisUiState, currentSoal: ObjekEntity, viewModel
                 status = statusOpsi(opsi, uiState, currentSoal),
                 onClick = { viewModel.pilihOpsiJawaban(opsi.idObjek) }
             )
-        }
-    }
-}
-
-// ── 5. Tebak Suara ───────────────────────────────────────────────────────────
-
-@Composable
-fun TebakSuaraView(uiState: KuisUiState, currentSoal: ObjekEntity, viewModel: KuisViewModel) {
-    val context = LocalContext.current
-    val audioManager = SiBekaApp.instance.container.audioManager
-    val putar = {
-        if (currentSoal.fileSuaraPath.isNotBlank()) audioManager.playSuaraFauna(currentSoal.fileSuaraPath)
-    }
-
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        KartuSiBeka(Modifier.fillMaxWidth(), container = HijauTua, borderColor = HijauTua, shape = RoundedCornerShape(24.dp)) {
-            Column(
-                Modifier.fillMaxWidth().padding(vertical = 22.dp).clickable { putar() },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Box(Modifier.size(150.dp).border(1.dp, Color.White.copy(alpha = 0.12f), CircleShape))
-                    Box(Modifier.size(120.dp).border(1.dp, Color.White.copy(alpha = 0.22f), CircleShape))
-                    Box(Modifier.size(90.dp).clip(CircleShape).background(KuningPlay), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.PlayArrow, "Putar suara", tint = HijauTua, modifier = Modifier.size(48.dp))
-                    }
-                }
-                Text("Ketuk untuk mendengar", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = PutihBersih)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Icon(Icons.AutoMirrored.Outlined.VolumeUp, null, tint = PutihBersih.copy(alpha = 0.8f), modifier = Modifier.size(14.dp))
-                    Text("Suara alam", fontSize = 11.sp, color = PutihBersih.copy(alpha = 0.8f))
-                }
-            }
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            uiState.opsiJawaban.forEach { opsi ->
-                val status = statusOpsi(opsi, uiState, currentSoal)
-                KartuPilihan(
-                    status = status,
-                    onClick = { viewModel.pilihOpsiJawaban(opsi.idObjek) },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Column(
-                        Modifier.fillMaxWidth().padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        AsyncImage(
-                            model = AssetImageLoader.buildAssetRequest(context, opsi.gambarUtamaPath, 240, 240),
-                            contentDescription = opsi.namaObjek,
-                            modifier = Modifier.fillMaxWidth().height(96.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                        Text(
-                            opsi.namaObjek, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut,
-                            textAlign = TextAlign.Center, maxLines = 2, minLines = 2
-                        )
-                        when (status) {
-                            StatusOpsi.BENAR -> Icon(Icons.Outlined.CheckCircle, null, tint = HijauBenar, modifier = Modifier.size(18.dp))
-                            StatusOpsi.SALAH -> Icon(Icons.Outlined.Cancel, null, tint = MerahSalah, modifier = Modifier.size(18.dp))
-                            else -> Box(Modifier.size(16.dp).border(1.5.dp, GarisKartu, CircleShape))
-                        }
-                    }
-                }
-            }
         }
     }
 }

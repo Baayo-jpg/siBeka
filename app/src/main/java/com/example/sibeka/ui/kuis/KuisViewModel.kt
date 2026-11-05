@@ -8,7 +8,6 @@ import com.example.sibeka.data.db.ObjekEntity
 import com.example.sibeka.data.model.ModeKuis
 import com.example.sibeka.data.model.StatusJawaban
 import com.example.sibeka.data.repository.SiBekaRepository
-import com.example.sibeka.util.AudioPlayerManager
 import com.example.sibeka.util.SfxPlayer
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,7 +26,7 @@ data class KuisUiState(
     // State khusus Mode Susun Huruf
     val hurufTersedia: List<Char> = emptyList(),
     val hurufTerpilih: List<Char> = emptyList(),
-    // State khusus Pilihan Ganda (Pasangkan, Tebak Siluet, Tebak Suara)
+    // State khusus Pilihan Ganda (Pasangkan)
     val opsiJawaban: List<ObjekEntity> = emptyList(),
     val opsiTerpilihId: String? = null,
     // State khusus Potongan Gambar (6 potongan: true = terbuka, false = tertutup)
@@ -37,8 +36,7 @@ data class KuisUiState(
 
 class KuisViewModel(
     private val repository: SiBekaRepository,
-    private val sfxPlayer: SfxPlayer,
-    private val audioManager: AudioPlayerManager
+    private val sfxPlayer: SfxPlayer
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KuisUiState())
@@ -93,7 +91,7 @@ class KuisViewModel(
                     )
                 }
             }
-            ModeKuis.PASANGKAN, ModeKuis.TEBAK_SILUET, ModeKuis.TEBAK_SUARA -> {
+            ModeKuis.PASANGKAN -> {
                 val decoys = repository.getDecoyAnswers(
                     habitatId = _uiState.value.habitatId,
                     excludeIds = listOf(soal.idObjek),
@@ -106,10 +104,6 @@ class KuisViewModel(
                         opsiTerpilihId = null,
                         statusJawaban = StatusJawaban.BELUM
                     )
-                }
-
-                if (mode == ModeKuis.TEBAK_SUARA && soal.fileSuaraPath.isNotBlank()) {
-                    audioManager.playSuaraFauna(soal.fileSuaraPath)
                 }
             }
             ModeKuis.POTONGAN_GAMBAR -> {
@@ -247,8 +241,7 @@ class KuisViewModel(
                 val container = SiBekaApp.instance.container
                 return KuisViewModel(
                     container.repository,
-                    container.sfxPlayer,
-                    container.audioManager
+                    container.sfxPlayer
                 ) as T
             }
         }

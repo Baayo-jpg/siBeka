@@ -39,8 +39,8 @@
                       "namaObjek":  "Dugong",
                       "kataKunci":  "DUGONG",
                       "faktaUnik":  "Dugong bernapas dengan paru-paru seperti manusia, sehingga harus sering muncul ke permukaan air.",
-                      "gambarUtamaPath":  "laut/fauna/dugon.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_padanglamun.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_padanglamun.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -50,8 +50,8 @@
                       "namaObjek":  "Elang Laut",
                       "kataKunci":  "ELANG",
                       "faktaUnik":  "Elang laut memiliki cengkeraman kaki yang sangat kuat untuk menangkap ikan yang sedang berenang.",
-                      "gambarUtamaPath":  "laut/fauna/elang-laut_perut_putih.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_ikanlaut.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_ikanlaut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -61,8 +61,8 @@
                       "namaObjek":  "Ikan Cakalang",
                       "kataKunci":  "CAKALANG",
                       "faktaUnik":  "Ikan cakalang sangat sering diolah menjadi makanan enak, seperti ikan asap atau abon.",
-                      "gambarUtamaPath":  "laut/fauna/ikan_cakalang.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_udangkecil.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_udangkecil.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -72,8 +72,8 @@
                       "namaObjek":  "Ikan Kuniran",
                       "kataKunci":  "KUNIRAN",
                       "faktaUnik":  "Ikan kuniran memiliki warna kuning cerah di tubuhnya yang mirip dengan warna kunyit.",
-                      "gambarUtamaPath":  "laut/fauna/ikan_pinang.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_cacinglaut.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_cacinglaut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -83,8 +83,8 @@
                       "namaObjek":  "Ikan Sebelah",
                       "kataKunci":  "SEBELAH",
                       "faktaUnik":  "Ikan unik ini berenang dengan posisi miring dan kedua matanya berada di sisi tubuh yang sama!",
-                      "gambarUtamaPath":  "laut/fauna/ikan_sebelah.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_pasirlaut.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_pasirlaut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -94,8 +94,8 @@
                       "namaObjek":  "Lumba-lumba",
                       "kataKunci":  "LUMBA",
                       "faktaUnik":  "Lumba-lumba berkomunikasi satu sama lain menggunakan suara siulan dan klik di dalam air.",
-                      "gambarUtamaPath":  "laut/fauna/lumba_hidung_botol.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_cumi.png",
+                      "gambarUtamaPath":  "laut/fauna/lumba_hidung_botol.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_cumi.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -105,8 +105,8 @@
                       "namaObjek":  "Penyu Hijau",
                       "kataKunci":  "PENYU",
                       "faktaUnik":  "Penyu hijau dapat menahan napas di dalam air selama beberapa jam saat sedang tidur!",
-                      "gambarUtamaPath":  "laut/fauna/penyu_hijau.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_uburubur.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_uburubur.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -116,8 +116,8 @@
                       "namaObjek":  "Penyu Sisik",
                       "kataKunci":  "SISIK",
                       "faktaUnik":  "Sisik cangkang penyu ini sangat indah dan sering bersembunyi di sekitar terumbu karang.",
-                      "gambarUtamaPath":  "laut/fauna/penyu_sisik.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_karang.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_karang.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -127,8 +127,8 @@
                       "namaObjek":  "Sotong Buluh",
                       "kataKunci":  "SOTONG",
                       "faktaUnik":  "Saat merasa takut, sotong akan menyemprotkan tinta hitam pekat ke wajah pemangsanya.",
-                      "gambarUtamaPath":  "laut/fauna/sotong_buluh.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_tinta.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_tinta.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -138,8 +138,8 @@
                       "namaObjek":  "Teripang Pasir",
                       "kataKunci":  "TERIPANG",
                       "faktaUnik":  "Teripang bergerak sangat lambat di dasar laut seperti ulat, dan bertugas membersihkan pasir laut.",
-                      "gambarUtamaPath":  "laut/fauna/teripang_pasir.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_plankton.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_plankton.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -149,8 +149,8 @@
                       "namaObjek":  "Lamun Alang",
                       "kataKunci":  "LAMUN",
                       "faktaUnik":  "Rumput lamun membentuk padang luas di bawah laut yang menjadi tempat favorit ikan untuk bertelur.",
-                      "gambarUtamaPath":  "laut/flora/lamun_alang.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_dasarlaut.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_dasarlaut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -160,8 +160,8 @@
                       "namaObjek":  "Pohon Bakau",
                       "kataKunci":  "BAKAU",
                       "faktaUnik":  "Pohon bakau memiliki akar yang sangat kuat untuk menahan ombak agar pantai tidak longsor.",
-                      "gambarUtamaPath":  "laut/flora/bakau_kurap.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_akartunjang.png",
+                      "gambarUtamaPath":  "laut/flora/bakau_kurap.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_akartunjang.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -171,8 +171,8 @@
                       "namaObjek":  "Pohon Nipah",
                       "kataKunci":  "NIPAH",
                       "faktaUnik":  "Daun nipah sering digunakan oleh penduduk untuk membuat atap rumah tradisional yang sejuk.",
-                      "gambarUtamaPath":  "laut/flora/nipah.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_buahnipah.png",
+                      "gambarUtamaPath":  "placeholder.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_buahnipah.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -182,8 +182,8 @@
                       "namaObjek":  "Rumput Latoh",
                       "kataKunci":  "LATOH",
                       "faktaUnik":  "Rumput laut latoh berbentuk seperti anggur kecil hijau dan sangat lezat jika dijadikan es campur!",
-                      "gambarUtamaPath":  "laut/flora/anggur_laut.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_esrumputlaut.png",
+                      "gambarUtamaPath":  "laut/flora/anggur_laut.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_esrumputlaut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -193,8 +193,8 @@
                       "namaObjek":  "Sargassum",
                       "kataKunci":  "ALGA",
                       "faktaUnik":  "Alga laut sargassum bisa tumbuh sangat rimbun bagaikan hutan tempat bersembunyi anak ikan.",
-                      "gambarUtamaPath":  "laut/flora/alga_cokelat.png",
-                      "gambarPasanganPath":  "laut/pasangan/pasangan_arusair.png",
+                      "gambarUtamaPath":  "laut/flora/alga_cokelat.svg",
+                      "gambarPasanganPath":  "laut/pasangan/pasangan_arusair.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -204,8 +204,8 @@
                       "namaObjek":  "Beruang Madu",
                       "kataKunci":  "BERUANG",
                       "faktaUnik":  "Beruang madu adalah jenis beruang terkecil di dunia dan sangat suka memanjat pohon!",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/beruang_madu.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_madu.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/beruang_madu.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_madu.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -215,8 +215,8 @@
                       "namaObjek":  "Burung Enggang",
                       "kataKunci":  "ENGGANG",
                       "faktaUnik":  "Burung enggang memiliki paruh besar berbentuk seperti tanduk sapi yang sangat kuat.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/enggang_badak.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_beringin.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/enggang_badak.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_beringin.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -226,8 +226,8 @@
                       "namaObjek":  "Kancil",
                       "kataKunci":  "KANCIL",
                       "faktaUnik":  "Kancil adalah hewan yang cerdik dan sangat cepat berlari menghindari pemangsa.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kancil.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_mentimun.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kancil.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_mentimun.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -237,8 +237,8 @@
                       "namaObjek":  "Kucing Merah",
                       "kataKunci":  "KUCING",
                       "faktaUnik":  "Kucing merah sangat langka dan hanya bisa ditemukan di pedalaman hutan Kalimantan.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kucing_merah.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_tikus.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kucing_merah.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_tikus.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -248,8 +248,8 @@
                       "namaObjek":  "Lutung Merah",
                       "kataKunci":  "LUTUNG",
                       "faktaUnik":  "Lutung merah suka memakan dedaunan segar dan memiliki bulu yang berwarna merah kecokelatan.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/lutung_merah.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_daunsegar.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/lutung_merah.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_daunsegar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -259,8 +259,8 @@
                       "namaObjek":  "Macan Dahan",
                       "kataKunci":  "MACAN",
                       "faktaUnik":  "Macan dahan suka beristirahat di dahan pohon dan memiliki corak tubuh seperti awan.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/macan_dahan.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_daging.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/macan_dahan.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_daging.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -270,8 +270,8 @@
                       "namaObjek":  "Monyet Ekor Panjang",
                       "kataKunci":  "MONYET",
                       "faktaUnik":  "Sesuai namanya, ekor monyet ini lebih panjang dari tubuhnya sendiri!",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kera_ekor_panjang.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_pisang.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/kera_ekor_panjang.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_pisang.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -281,8 +281,8 @@
                       "namaObjek":  "Orangutan",
                       "kataKunci":  "ORANGUTAN",
                       "faktaUnik":  "Orangutan bisa membuat payung dari daun-daun besar saat hujan turun di hutan.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/orang_utan.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahhutan.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/orang_utan.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahhutan.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -292,8 +292,8 @@
                       "namaObjek":  "Rusa Sambar",
                       "kataKunci":  "RUSA",
                       "faktaUnik":  "Rusa sambar adalah jenis rusa terbesar di Indonesia dan suka memakan rumput.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/rusa_sambar.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_rumput.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/rusa_sambar.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_rumput.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -303,8 +303,8 @@
                       "namaObjek":  "Trenggiling",
                       "kataKunci":  "TRENGGILING",
                       "faktaUnik":  "Jika merasa terancam, trenggiling akan menggulung tubuhnya menjadi bola sisik yang keras.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/trenggiling.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_semut.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/fauna/trenggiling.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_semut.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -314,8 +314,8 @@
                       "namaObjek":  "Anggrek Hitam",
                       "kataKunci":  "ANGGREK",
                       "faktaUnik":  "Bunga anggrek ini disebut hitam karena bagian tengah lidah bunganya berwarna hitam kelam.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/anggrek_hitam.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_pohoninang.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/anggrek_hitam.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_pohoninang.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -325,8 +325,8 @@
                       "namaObjek":  "Asam Payang",
                       "kataKunci":  "PAYANG",
                       "faktaUnik":  "Buah asam payang memiliki kulit tebal seperti mangga, tetapi ukurannya jauh lebih besar.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/asam_payang.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahpayang.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/asam_payang.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahpayang.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -336,8 +336,8 @@
                       "namaObjek":  "Asam Putar",
                       "kataKunci":  "PUTAR",
                       "faktaUnik":  "Cara memakan buah ini sangat unik, yaitu dengan memutar buahnya sampai terbelah dua.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/asam_putar.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahputar.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/asam_putar.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_buahputar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -347,8 +347,8 @@
                       "namaObjek":  "Bunga Bangkai",
                       "kataKunci":  "RAFFLESIA",
                       "faktaUnik":  "Bunga ini mengeluarkan bau busuk untuk menarik lalat agar membantunya berkembang biak.",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/bunga_bangkai.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_lalat_bunga.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/bunga_bangkai.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_lalat_bunga.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -358,8 +358,8 @@
                       "namaObjek":  "Pohon Ulin",
                       "kataKunci":  "ULIN",
                       "faktaUnik":  "Kayu ulin sangat kuat sampai disebut \u0027kayu besi\u0027 dan tidak akan lapuk meski terendam air ratusan tahun!",
-                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/ulin.png",
-                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_balokkayu.png",
+                      "gambarUtamaPath":  "hutan_hujan_tropis/flora/ulin.svg",
+                      "gambarPasanganPath":  "hutan_hujan_tropis/pasangan/pasangan_balokkayu.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -369,8 +369,8 @@
                       "namaObjek":  "Bebek Liar",
                       "kataKunci":  "BEBEK",
                       "faktaUnik":  "Bulu bebek liar berlapis minyak alami sehingga tubuhnya tidak pernah basah kuyup meski terus berenang.",
-                      "gambarUtamaPath":  "rawa/fauna/bebek_liar.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_keongsawah.png",
+                      "gambarUtamaPath":  "rawa/fauna/bebek_liar.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_keongsawah.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -380,8 +380,8 @@
                       "namaObjek":  "Bekantan",
                       "kataKunci":  "BEKANTAN",
                       "faktaUnik":  "Hidung monyet ini panjang dan besar sekali seperti terong, dan ia mahir berenang menyeberangi sungai!",
-                      "gambarUtamaPath":  "rawa/fauna/Bekantan_NasalisLarvatus.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_daunrambai.png",
+                      "gambarUtamaPath":  "rawa/fauna/Bekantan_NasalisLarvatus.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_daunrambai.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -391,8 +391,8 @@
                       "namaObjek":  "Biawak",
                       "kataKunci":  "BIAWAK",
                       "faktaUnik":  "Biawak sering menjulurkan lidahnya untuk mencium bau makanan dari jarak yang sangat jauh.",
-                      "gambarUtamaPath":  "rawa/fauna/biawak.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bangkai.png",
+                      "gambarUtamaPath":  "rawa/fauna/biawak.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bangkai.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -402,8 +402,8 @@
                       "namaObjek":  "Ikan Sepat",
                       "kataKunci":  "SEPAT",
                       "faktaUnik":  "Mulut ikan sepat menghadap ke atas agar mudah menangkap serangga di permukaan rawa.",
-                      "gambarUtamaPath":  "rawa/fauna/sepat.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_jentik.png",
+                      "gambarUtamaPath":  "rawa/fauna/sepat.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_jentik.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -413,8 +413,8 @@
                       "namaObjek":  "Katak Rawa",
                       "kataKunci":  "KATAK",
                       "faktaUnik":  "Sebelum menjadi katak, hewan pelompat ini awalnya berupa berudu (kecebong) yang hidup di air!",
-                      "gambarUtamaPath":  "rawa/fauna/katak_sawah.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_nyamuk.png",
+                      "gambarUtamaPath":  "rawa/fauna/katak_sawah.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_nyamuk.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -424,8 +424,8 @@
                       "namaObjek":  "Keong Mas",
                       "kataKunci":  "KEONG",
                       "faktaUnik":  "Keong mas memiliki cangkang berwarna kuning keemasan yang indah, tetapi sayangnya sering merusak padi.",
-                      "gambarUtamaPath":  "rawa/fauna/siput_murbai.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_daunpadi.png",
+                      "gambarUtamaPath":  "rawa/fauna/siput_murbai.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_daunpadi.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -435,8 +435,8 @@
                       "namaObjek":  "Kucing Tandang",
                       "kataKunci":  "KUCING",
                       "faktaUnik":  "Kucing kepala datar ini sangat jago menangkap ikan dan lebih suka hidup di rawa yang basah.",
-                      "gambarUtamaPath":  "rawa/fauna/kucing_tandang.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_ikanrawa.png",
+                      "gambarUtamaPath":  "rawa/fauna/kucing_tandang.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_ikanrawa.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -446,8 +446,8 @@
                       "namaObjek":  "Tupai Hutan",
                       "kataKunci":  "TUPAI",
                       "faktaUnik":  "Ekor tupai sangat lebat seperti kemoceng yang membantunya menyeimbangkan diri saat melompat jauh.",
-                      "gambarUtamaPath":  "rawa/fauna/tupai_tanah.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bijibijian.png",
+                      "gambarUtamaPath":  "rawa/fauna/tupai_tanah.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bijibijian.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -457,8 +457,8 @@
                       "namaObjek":  "Ular Air",
                       "kataKunci":  "ULAR",
                       "faktaUnik":  "Ular air bisa menutup lubang hidungnya dengan rapat saat sedang menyelam ke dalam air.",
-                      "gambarUtamaPath":  "rawa/fauna/ular_air_belang.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_katak.png",
+                      "gambarUtamaPath":  "rawa/fauna/ular_air_belang.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_katak.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -468,8 +468,8 @@
                       "namaObjek":  "Udang Galah",
                       "kataKunci":  "UDANG",
                       "faktaUnik":  "Capit udang galah jantan bisa tumbuh menjadi sangat panjang berwarna biru, bahkan lebih panjang dari tubuhnya!",
-                      "gambarUtamaPath":  "rawa/fauna/udang_galah.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_capit.png",
+                      "gambarUtamaPath":  "rawa/fauna/udang_galah.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_capit.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -479,8 +479,8 @@
                       "namaObjek":  "Eceng Gondok",
                       "kataKunci":  "ECENG",
                       "faktaUnik":  "Pangkal daun eceng gondok menggembung seperti balon yang berisi udara agar bisa mengapung kokoh di air.",
-                      "gambarUtamaPath":  "rawa/flora/eceng_gondok.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_airrawa.png",
+                      "gambarUtamaPath":  "rawa/flora/eceng_gondok.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_airrawa.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -490,8 +490,8 @@
                       "namaObjek":  "Jelutung Rawa",
                       "kataKunci":  "JELUTUNG",
                       "faktaUnik":  "Getah putih pohon jelutung dulunya sangat berharga karena dipakai untuk membuat permen karet!",
-                      "gambarUtamaPath":  "rawa/flora/jelutung_rawa.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_getahkaret.png",
+                      "gambarUtamaPath":  "rawa/flora/jelutung_rawa.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_getahkaret.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -501,8 +501,8 @@
                       "namaObjek":  "Kantong Semar",
                       "kataKunci":  "KANTONG",
                       "faktaUnik":  "Kantong yang bergelantungan itu berisi cairan khusus untuk menangkap serangga malang yang masuk!",
-                      "gambarUtamaPath":  "rawa/flora/kantong_semar_gambut.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_lalathutan.png",
+                      "gambarUtamaPath":  "rawa/flora/kantong_semar_gambut.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_lalathutan.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -512,8 +512,8 @@
                       "namaObjek":  "Pohon Sagu",
                       "kataKunci":  "SAGU",
                       "faktaUnik":  "Batang pohon ini dibelah untuk diambil sari patinya yang putih untuk dijadikan tepung sagu.",
-                      "gambarUtamaPath":  "rawa/flora/rumbia.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_tepungsagu.png",
+                      "gambarUtamaPath":  "rawa/flora/rumbia.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_tepungsagu.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -523,8 +523,8 @@
                       "namaObjek":  "Teratai",
                       "kataKunci":  "TERATAI",
                       "faktaUnik":  "Meski berakar di dalam lumpur rawa yang kotor, teratai mekar menjadi bunga yang sangat wangi dan bersih.",
-                      "gambarUtamaPath":  "rawa/flora/teratai.png",
-                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bunga_mekar.png",
+                      "gambarUtamaPath":  "rawa/flora/teratai.svg",
+                      "gambarPasanganPath":  "rawa/pasangan/pasangan_bunga_mekar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -534,8 +534,8 @@
                       "namaObjek":  "Berang-berang",
                       "kataKunci":  "BERANG",
                       "faktaUnik":  "Berang-berang punya cakar yang lucu untuk memegang makanan seperti manusia memegang makanan.",
-                      "gambarUtamaPath":  "sungai/fauna/berang-berang-cakar_kecil_Asia.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_ikanairtawar.png",
+                      "gambarUtamaPath":  "sungai/fauna/berang-berang-cakar_kecil_Asia.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_ikanairtawar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -545,8 +545,8 @@
                       "namaObjek":  "Buaya Muara",
                       "kataKunci":  "BUAYA",
                       "faktaUnik":  "Buaya muara merupakan reptil terbesar di dunia yang sering berdiam diri seperti batang kayu mati di air.",
-                      "gambarUtamaPath":  "sungai/fauna/buaya.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_dagingsegar.png",
+                      "gambarUtamaPath":  "sungai/fauna/buaya.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_dagingsegar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -556,8 +556,8 @@
                       "namaObjek":  "Ikan Arwana",
                       "kataKunci":  "ARWANA",
                       "faktaUnik":  "Ikan arwana jantan adalah ayah yang hebat karena menjaga telur-telurnya di dalam mulutnya sendiri!",
-                      "gambarUtamaPath":  "sungai/fauna/arwana.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_arwanakecil.png",
+                      "gambarUtamaPath":  "sungai/fauna/arwana.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_arwanakecil.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -567,8 +567,8 @@
                       "namaObjek":  "Ikan Baung",
                       "kataKunci":  "BAUNG",
                       "faktaUnik":  "Ikan air tawar mirip lele ini memiliki tiga duri patil yang tajam di siripnya untuk berlindung.",
-                      "gambarUtamaPath":  "sungai/fauna/baung.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_patil.png",
+                      "gambarUtamaPath":  "sungai/fauna/baung.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_patil.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -578,8 +578,8 @@
                       "namaObjek":  "Ikan Belida",
                       "kataKunci":  "BELIDA",
                       "faktaUnik":  "Ikan purba ini memiliki sirip bawah yang menyatu panjang sehingga ia bisa berenang mundur dengan mudah.",
-                      "gambarUtamaPath":  "sungai/fauna/belida.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_siripbawah.png",
+                      "gambarUtamaPath":  "sungai/fauna/belida.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_siripbawah.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -589,8 +589,8 @@
                       "namaObjek":  "Ikan Gabus",
                       "kataKunci":  "GABUS",
                       "faktaUnik":  "Ikan predator ini memiliki organ pernapasan tambahan sehingga kuat bertahan hidup di lumpur kering.",
-                      "gambarUtamaPath":  "sungai/fauna/gabus.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_insangtambahan.png",
+                      "gambarUtamaPath":  "sungai/fauna/gabus.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_insangtambahan.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -600,8 +600,8 @@
                       "namaObjek":  "Ikan Patin",
                       "kataKunci":  "PATIN",
                       "faktaUnik":  "Ikan patin tidak memiliki sisik sama sekali, kulitnya sangat licin dan suka hidup di dasar sungai.",
-                      "gambarUtamaPath":  "sungai/fauna/patin.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_kulitlicin.png",
+                      "gambarUtamaPath":  "sungai/fauna/patin.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_kulitlicin.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -611,8 +611,8 @@
                       "namaObjek":  "Kura-kura Air",
                       "kataKunci":  "KURA",
                       "faktaUnik":  "Kura-kura air memiliki selaput di antara jari kakinya yang berfungsi sebagai pendayung saat berenang.",
-                      "gambarUtamaPath":  "sungai/fauna/KuraKura_Cangkang_Pipih.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_selaputkaki.png",
+                      "gambarUtamaPath":  "sungai/fauna/KuraKura_Cangkang_Pipih.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_selaputkaki.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -622,8 +622,8 @@
                       "namaObjek":  "Labis / Bulus",
                       "kataKunci":  "BULUS",
                       "faktaUnik":  "Berbeda dengan kura-kura biasa, cangkang atas bulus bertekstur lunak dan dilapisi kulit tebal.",
-                      "gambarUtamaPath":  "sungai/fauna/bulus.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_cangkanglunak.png",
+                      "gambarUtamaPath":  "sungai/fauna/bulus.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_cangkanglunak.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -633,8 +633,8 @@
                       "namaObjek":  "Pesut Mahakam",
                       "kataKunci":  "PESUT",
                       "faktaUnik":  "Pesut air tawar legendaris ini tidak memiliki moncong panjang dan suka menyemburkan air saat berburu!",
-                      "gambarUtamaPath":  "sungai/fauna/pesut.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_semburanair.png",
+                      "gambarUtamaPath":  "sungai/fauna/pesut.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_semburanair.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -644,8 +644,8 @@
                       "namaObjek":  "Bakung Air",
                       "kataKunci":  "BAKUNG",
                       "faktaUnik":  "Tumbuhan tepi sungai ini memiliki bunga putih cantik bermahkota sempit yang mekar indah.",
-                      "gambarUtamaPath":  "sungai/flora/bakung.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_bungaputih.png",
+                      "gambarUtamaPath":  "sungai/flora/bakung.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_bungaputih.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -655,8 +655,8 @@
                       "namaObjek":  "Kiambang",
                       "kataKunci":  "KIAMBANG",
                       "faktaUnik":  "Daun kiambang dilapisi bulu-bulu halus kedap air yang menjaganya tetap kering meski mengapung.",
-                      "gambarUtamaPath":  "sungai/flora/kiambang.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_buluair.png",
+                      "gambarUtamaPath":  "sungai/flora/kiambang.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_buluair.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -666,8 +666,8 @@
                       "namaObjek":  "Kangkung Air",
                       "kataKunci":  "KANGKUNG",
                       "faktaUnik":  "Batang kangkung air memiliki rongga udara di dalamnya, bertindak seperti pelampung alami.",
-                      "gambarUtamaPath":  "sungai/flora/kangkung.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_batangrongga.png",
+                      "gambarUtamaPath":  "sungai/flora/kangkung.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_batangrongga.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -677,8 +677,8 @@
                       "namaObjek":  "Pandan Air",
                       "kataKunci":  "PANDAN",
                       "faktaUnik":  "Pandan air tumbuh berumpun tebal di tepi sungai dengan akar kuat yang membantu menahan erosi.",
-                      "gambarUtamaPath":  "sungai/flora/rasau.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_akarjangkar.png",
+                      "gambarUtamaPath":  "sungai/flora/rasau.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_akarjangkar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -688,8 +688,8 @@
                       "namaObjek":  "Rumput Purun",
                       "kataKunci":  "PURUN",
                       "faktaUnik":  "Rumput air berbatang lurus dan pipih ini sering dipanen warga untuk dijadikan anyaman tikar.",
-                      "gambarUtamaPath":  "sungai/flora/purun.png",
-                      "gambarPasanganPath":  "sungai/pasangan/pasangan_batangpipih.png",
+                      "gambarUtamaPath":  "sungai/flora/purun.svg",
+                      "gambarPasanganPath":  "sungai/pasangan/pasangan_batangpipih.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -699,8 +699,8 @@
                       "namaObjek":  "Babi Hutan",
                       "kataKunci":  "BABI",
                       "faktaUnik":  "Babi hutan memakai moncong hidungnya yang kuat untuk menggali tanah keras demi mencari ubi-ubian.",
-                      "gambarUtamaPath":  "gunung/fauna/babi_celeng.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_umbi.png",
+                      "gambarUtamaPath":  "gunung/fauna/babi_celeng.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_umbi.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -710,8 +710,8 @@
                       "namaObjek":  "Beruk",
                       "kataKunci":  "BERUK",
                       "faktaUnik":  "Tubuh beruk jauh lebih besar dari monyet biasa, dan kadang dilatih orang desa untuk memetik kelapa lho!",
-                      "gambarUtamaPath":  "gunung/fauna/beruk.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_buahkelapa.png",
+                      "gambarUtamaPath":  "gunung/fauna/beruk.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_buahkelapa.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -721,8 +721,8 @@
                       "namaObjek":  "Burung Punai",
                       "kataKunci":  "PUNAI",
                       "faktaUnik":  "Burung merpati hutan ini memiliki kombinasi warna bulu hijau dan oranye yang sangat cantik di pucuk pohon.",
-                      "gambarUtamaPath":  "gunung/fauna/punai_bakau.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_bijiberingin.png",
+                      "gambarUtamaPath":  "gunung/fauna/punai_bakau.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_bijiberingin.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -732,8 +732,8 @@
                       "namaObjek":  "Elang Ular",
                       "kataKunci":  "ELANG",
                       "faktaUnik":  "Cengkeraman kaki and paruh elang ini dirancang sangat tajam untuk memangsa ular-ular panjang dari langit!",
-                      "gambarUtamaPath":  "gunung/fauna/elang_ular.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_ular.png",
+                      "gambarUtamaPath":  "gunung/fauna/elang_ular.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_ular.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -743,8 +743,8 @@
                       "namaObjek":  "Katak Pohon",
                       "kataKunci":  "KATAK",
                       "faktaUnik":  "Karena menempel di atas pohon tinggi, katak ini bersembunyi dengan menyamarkan warnanya seperti daun!",
-                      "gambarUtamaPath":  "gunung/fauna/katak_pohon.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_daunembun.png",
+                      "gambarUtamaPath":  "gunung/fauna/katak_pohon.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_daunembun.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -754,8 +754,8 @@
                       "namaObjek":  "Kera Ekor Panjang",
                       "kataKunci":  "KERA",
                       "faktaUnik":  "Kera ini sering sekali turun dari gunung dan bermain di pinggir jalan untuk meminta makanan pisang.",
-                      "gambarUtamaPath":  "gunung/fauna/kera_ekor_panjang.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_ranting.png",
+                      "gambarUtamaPath":  "gunung/fauna/kera_ekor_panjang_.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_ranting.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -765,8 +765,8 @@
                       "namaObjek":  "Landak",
                       "kataKunci":  "LANDAK",
                       "faktaUnik":  "Duri di punggung landak sebetulnya adalah rambut kaku berongga yang siap menusuk jika ia diganggu musuh.",
-                      "gambarUtamaPath":  "gunung/fauna/landak.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_duri.png",
+                      "gambarUtamaPath":  "gunung/fauna/landak.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_duri.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -776,8 +776,8 @@
                       "namaObjek":  "Owa Kelawat",
                       "kataKunci":  "OWA",
                       "faktaUnik":  "Owa memiliki lengan super panjang yang digunakan untuk berayun lincah dari satu pohon ke pohon lainnya (brachiation).",
-                      "gambarUtamaPath":  "gunung/fauna/owa_kelawat.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_buahara.png",
+                      "gambarUtamaPath":  "gunung/fauna/owa_kelawat.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_buahara.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -787,8 +787,8 @@
                       "namaObjek":  "Tarsius",
                       "kataKunci":  "TARSIUS",
                       "faktaUnik":  "Primata terkecil di dunia ini bisa memutar kepalanya 180 derajat dan memiliki mata sebesar otaknya sendiri!",
-                      "gambarUtamaPath":  "gunung/fauna/tarsius.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_seranggamalam.png",
+                      "gambarUtamaPath":  "gunung/fauna/tarsius.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_seranggamalam.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -798,8 +798,8 @@
                       "namaObjek":  "Ular Piton",
                       "kataKunci":  "PITON",
                       "faktaUnik":  "Piton tidak memiliki racun bisa, ia melilitkan tubuhnya dengan sangat kuat sebelum menelan mangsanya bulat-bulat.",
-                      "gambarUtamaPath":  "gunung/fauna/sanca_kembang.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_tikusbesar.png",
+                      "gambarUtamaPath":  "gunung/fauna/sanca_kembang.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_tikusbesar.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -809,8 +809,8 @@
                       "namaObjek":  "Cemara Gunung",
                       "kataKunci":  "CEMARA",
                       "faktaUnik":  "Daun pohon ini tidak pernah rontok dan bentuknya tajam seperti jarum agar tahan terhadap suhu udara pegunungan.",
-                      "gambarUtamaPath":  "gunung/flora/cemara_gunung.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_kabutdingin.png",
+                      "gambarUtamaPath":  "gunung/flora/cemara_gunung.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_kabutdingin.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -820,8 +820,8 @@
                       "namaObjek":  "Kantong Rajah",
                       "kataKunci":  "RAJAH",
                       "faktaUnik":  "Ini adalah spesies kantong semar endemik pegunungan yang sangat langka dan berukuran luar biasa besar.",
-                      "gambarUtamaPath":  "gunung/flora/semar_endemik.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_tanahberbatu.png",
+                      "gambarUtamaPath":  "gunung/flora/semar_endemik.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_tanahberbatu.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -831,8 +831,8 @@
                       "namaObjek":  "Pasak Bumi",
                       "kataKunci":  "PASAK",
                       "faktaUnik":  "Akar pohon yang dijuluki Tongkat Ali ini tumbuh tegak lurus menembus tanah gunung seperti pasak (paku).",
-                      "gambarUtamaPath":  "gunung/flora/pasak_bumi.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_akarobat.png",
+                      "gambarUtamaPath":  "gunung/flora/pasak_bumi.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_akarobat.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -842,8 +842,8 @@
                       "namaObjek":  "Pohon Pelawan",
                       "kataKunci":  "PELAWAN",
                       "faktaUnik":  "Batang pohon ini terlihat seolah terbakar dan terus terkelupas karena memiliki lapisan kulit merah yang tipis.",
-                      "gambarUtamaPath":  "gunung/flora/pohon_pelawat.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_batangmerah.png",
+                      "gambarUtamaPath":  "gunung/flora/pohon_pelawat.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_batangmerah.svg",
                       "fileSuaraPath":  ""
                   },
                   {
@@ -853,8 +853,8 @@
                       "namaObjek":  "Sundew / Drosera",
                       "kataKunci":  "DROSERA",
                       "faktaUnik":  "Tumbuhan kecil di bebatuan gunung ini memproduksi butiran embun lengket untuk menjebak nyamuk di daunnya.",
-                      "gambarUtamaPath":  "gunung/flora/sundew.png",
-                      "gambarPasanganPath":  "gunung/pasangan/pasangan_embunlengket.png",
+                      "gambarUtamaPath":  "gunung/flora/sundew.svg",
+                      "gambarPasanganPath":  "gunung/pasangan/pasangan_embunlengket.svg",
                       "fileSuaraPath":  ""
                   }
               ]

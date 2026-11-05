@@ -37,9 +37,7 @@ enum class TabUtama { PETA, KOLEKSI, TOKO }
 // ── Maskot ──────────────────────────────────────────────────────────────────
 /**
  * Maskot Si Beka. Saat ini masih emoji.
- * Kalau ilustrasi sudah ada di res/drawable (mis. si_beka.png), ganti isi Box dengan:
- *   Image(painterResource(R.drawable.si_beka), null, Modifier.fillMaxSize())
- * Semua layar otomatis ikut berubah.
+ * Ilustrasi SVG dari assets dapat ditampilkan melalui Coil AsyncImage.
  */
 @Composable
 fun MaskotSiBeka(modifier: Modifier = Modifier, size: Dp = 48.dp, melompat: Boolean = false) {

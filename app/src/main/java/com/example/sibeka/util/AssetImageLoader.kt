@@ -2,6 +2,7 @@ package com.example.sibeka.util
 
 import android.content.Context
 import coil.ImageLoader
+import coil.decode.SvgDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 
@@ -9,6 +10,9 @@ object AssetImageLoader {
 
     fun createImageLoader(context: Context): ImageLoader {
         return ImageLoader.Builder(context)
+            .components {
+                add(SvgDecoder.Factory())
+            }
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.DISABLED) // Assets lokal tidak perlu disk cache ganda
             .crossfade(180)
@@ -28,6 +32,7 @@ object AssetImageLoader {
         return ImageRequest.Builder(context)
             .data(fullUri)
             .size(targetWidth, targetHeight)
+            .error(com.example.sibeka.R.drawable.ic_asset_missing)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.DISABLED)
             .crossfade(150)

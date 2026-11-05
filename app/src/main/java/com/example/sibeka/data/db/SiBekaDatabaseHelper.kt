@@ -26,7 +26,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
 
     companion object {
         const val DATABASE_NAME = "sibeka_offline.db"
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
 
         @Volatile
         private var INSTANCE: SiBekaDatabaseHelper? = null
@@ -92,12 +92,12 @@ class SiBekaDatabaseHelper(private val context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 2) {
-            updateMainImagePathsFromSeedData(db)
+        if (oldVersion < 3) {
+            updateImagePathsFromSeedData(db)
         }
     }
 
-    private fun updateMainImagePathsFromSeedData(db: SQLiteDatabase) {
+    private fun updateImagePathsFromSeedData(db: SQLiteDatabase) {
         val seed = context.assets.open("data/seed_data.json").use { stream ->
             InputStreamReader(stream).use { reader ->
                 Gson().fromJson(reader, SeedDataWrapper::class.java)
@@ -109,6 +109,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
             for (objek in seed.objek) {
                 val values = ContentValues().apply {
                     put("gambarUtamaPath", objek.gambarUtamaPath)
+                    put("gambarPasanganPath", objek.gambarPasanganPath)
                 }
                 db.update(
                     "objek_flora_fauna",

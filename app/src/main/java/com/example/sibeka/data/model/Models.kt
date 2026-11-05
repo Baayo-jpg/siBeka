@@ -22,8 +22,8 @@ data class ObjekFloraFauna(
     val namaObjek: String,        // "Beruang Madu"
     val kataKunci: String,        // "BERUANG" (untuk susun huruf)
     val faktaUnik: String,        // "Beruang madu adalah beruang terkecil..."
-    val gambarUtamaPath: String,  // "hutan_hujan_tropis/fauna/beruang_madu.png"
-    val gambarPasanganPath: String, // "hutan_hujan_tropis/pasangan/pasangan_madu.png"
+    val gambarUtamaPath: String,  // "hutan_hujan_tropis/fauna/beruang_madu.svg"
+    val gambarPasanganPath: String, // "hutan_hujan_tropis/pasangan/pasangan_madu.svg"
     val fileSuaraPath: String = ""  // "audio/fauna/beruang_madu.mp3" (opsional)
 )
 
@@ -55,8 +55,6 @@ data class ProgresPemain(
 enum class ModeKuis {
     PASANGKAN,
     SUSUN_HURUF,
-    TEBAK_SUARA,
-    TEBAK_SILUET,
     POTONGAN_GAMBAR
 }
 

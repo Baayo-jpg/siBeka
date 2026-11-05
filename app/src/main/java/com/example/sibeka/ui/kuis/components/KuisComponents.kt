@@ -133,7 +133,7 @@ fun OpsiBerhuruf(
     }
 }
 
-/** Kartu pilihan berisi gambar (dipakai Tebak Suara & Pasangkan). */
+/** Kartu pilihan berisi gambar (dipakai mode Pasangkan). */
 @Composable
 fun KartuPilihan(
     status: StatusOpsi,

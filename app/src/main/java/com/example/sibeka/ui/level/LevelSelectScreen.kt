@@ -51,9 +51,7 @@ fun LevelSelectScreen(
     val daftarMode = listOf(
         MenuKuisItem(ModeKuis.SUSUN_HURUF, "Susun Huruf", "🔤", "Susun huruf teracak menjadi nama flora atau fauna yang tepat", HijauUtama),
         MenuKuisItem(ModeKuis.PASANGKAN, "Pasangkan Gambar", "🔗", "Cocokkan hewan/tumbuhan dengan pasangan makanannya atau karakternya", BiruLaut),
-        MenuKuisItem(ModeKuis.TEBAK_SILUET, "Tebak Siluet", "🕵️", "Kenali bayangan hitam misterius fauna & flora endemik", CoklatKayu),
         MenuKuisItem(ModeKuis.POTONGAN_GAMBAR, "Potongan Gambar", "🍃", "Buka sedikit potongan penutup untuk menebak gambarnya", OranjeAksen),
-        MenuKuisItem(ModeKuis.TEBAK_SUARA, "Tebak Suara", "🔊", "Dengarkan suara asli hewan dan tebak nama faunanya", WarnaRawa)
     )
 
     Scaffold(

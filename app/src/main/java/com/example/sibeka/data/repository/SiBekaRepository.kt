@@ -4,15 +4,20 @@ import com.example.sibeka.data.db.HabitatEntity
 import com.example.sibeka.data.db.KoleksiEntity
 import com.example.sibeka.data.db.ObjekEntity
 import com.example.sibeka.data.db.SiBekaDatabaseHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SiBekaRepository(
     private val dbHelper: SiBekaDatabaseHelper,
     val dataStore: DataStoreManager
 ) {
     init {
-        dbHelper.refreshFlows()
+        CoroutineScope(Dispatchers.IO).launch {
+            dbHelper.refreshFlows()
+        }
     }
 
     fun getAllHabitats(): Flow<List<HabitatEntity>> = dbHelper.habitatsFlow
