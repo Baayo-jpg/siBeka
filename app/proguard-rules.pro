@@ -1,0 +1,4 @@
+-keepattributes Signature
+-keep class com.example.sibeka.data.db.SeedDataWrapper { *; }
+-keep class com.example.sibeka.data.db.HabitatEntity { *; }
+-keep class com.example.sibeka.data.db.ObjekEntity { *; }

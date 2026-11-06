@@ -5,10 +5,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.io.InputStreamReader
 
 data class SeedDataWrapper(
@@ -26,7 +24,8 @@ class SiBekaDatabaseHelper(private val context: Context) :
 
     companion object {
         const val DATABASE_NAME = "sibeka_offline.db"
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 5
+        private const val TAG = "SiBekaDatabase"
 
         @Volatile
         private var INSTANCE: SiBekaDatabaseHelper? = null
@@ -38,12 +37,6 @@ class SiBekaDatabaseHelper(private val context: Context) :
         }
     }
 
-    private val _habitatsFlow = MutableStateFlow<List<HabitatEntity>>(emptyList())
-    val habitatsFlow: Flow<List<HabitatEntity>> = _habitatsFlow.asStateFlow()
-
-    private val _koleksiFlow = MutableStateFlow<List<KoleksiEntity>>(emptyList())
-    val koleksiFlow: Flow<List<KoleksiEntity>> = _koleksiFlow.asStateFlow()
-
     override fun onCreate(db: SQLiteDatabase) {
         // 1. Buat Tabel HABITAT
         db.execSQL(
@@ -51,8 +44,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
             CREATE TABLE habitat (
                 id TEXT PRIMARY KEY,
                 namaHabitat TEXT NOT NULL,
-                assetFolder TEXT NOT NULL,
-                isUnlocked INTEGER NOT NULL DEFAULT 0
+                assetFolder TEXT NOT NULL
             )
             """.trimIndent()
         )
@@ -69,7 +61,6 @@ class SiBekaDatabaseHelper(private val context: Context) :
                 faktaUnik TEXT NOT NULL,
                 gambarUtamaPath TEXT NOT NULL,
                 gambarPasanganPath TEXT NOT NULL,
-                fileSuaraPath TEXT NOT NULL,
                 FOREIGN KEY (idHabitat) REFERENCES habitat (id)
             )
             """.trimIndent()
@@ -94,6 +85,12 @@ class SiBekaDatabaseHelper(private val context: Context) :
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 3) {
             updateImagePathsFromSeedData(db)
+        }
+        if (oldVersion < 4) {
+            migrateToVersionFour(db)
+        }
+        if (oldVersion < 5) {
+            migrateToVersionFive(db)
         }
     }
 
@@ -137,7 +134,6 @@ class SiBekaDatabaseHelper(private val context: Context) :
                                     put("id", h.id)
                                     put("namaHabitat", h.namaHabitat)
                                     put("assetFolder", h.assetFolder)
-                                    put("isUnlocked", if (h.isUnlocked) 1 else 0)
                                 }
                                 db.insertWithOnConflict("habitat", null, values, SQLiteDatabase.CONFLICT_IGNORE)
                             }
@@ -152,7 +148,6 @@ class SiBekaDatabaseHelper(private val context: Context) :
                                     put("faktaUnik", o.faktaUnik)
                                     put("gambarUtamaPath", o.gambarUtamaPath)
                                     put("gambarPasanganPath", o.gambarPasanganPath)
-                                    put("fileSuaraPath", o.fileSuaraPath)
                                 }
                                 db.insertWithOnConflict("objek_flora_fauna", null, values, SQLiteDatabase.CONFLICT_IGNORE)
                             }
@@ -160,17 +155,97 @@ class SiBekaDatabaseHelper(private val context: Context) :
                         } finally {
                             db.endTransaction()
                         }
+                    } else {
+                        Log.e(TAG, "Data seed dari assets/data/seed_data.json bernilai null")
                     }
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Gagal memuat data seed dari assets/data/seed_data.json", e)
         }
     }
 
-    fun refreshFlows() {
-        _habitatsFlow.value = getAllHabitatsSync()
-        _koleksiFlow.value = getAllKoleksiSync()
+    private fun migrateToVersionFour(db: SQLiteDatabase) {
+        db.beginTransaction()
+        try {
+            db.delete(
+                "buku_koleksi",
+                "idObjek IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf(
+                    "LT-F-001", "LT-F-002", "LT-F-003", "LT-F-004", "LT-F-005",
+                    "LT-F-007", "LT-F-008", "LT-F-009", "LT-F-010", "LT-F-011", "LT-F-013"
+                )
+            )
+            db.delete(
+                "objek_flora_fauna",
+                "idObjek IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                arrayOf(
+                    "LT-F-001", "LT-F-002", "LT-F-003", "LT-F-004", "LT-F-005",
+                    "LT-F-007", "LT-F-008", "LT-F-009", "LT-F-010", "LT-F-011", "LT-F-013"
+                )
+            )
+            db.execSQL("UPDATE objek_flora_fauna SET kataKunci = 'KUCINGMERAH' WHERE idObjek = 'HH-F-019'")
+            db.execSQL("UPDATE objek_flora_fauna SET kataKunci = 'KUCINGTANDANG' WHERE idObjek = 'RW-F-037'")
+            db.execSQL("UPDATE objek_flora_fauna SET kataKunci = 'KATAKRAWA' WHERE idObjek = 'RW-F-035'")
+            db.execSQL("UPDATE objek_flora_fauna SET kataKunci = 'KATAKPOHON' WHERE idObjek = 'GN-F-065'")
+            db.execSQL("UPDATE objek_flora_fauna SET kataKunci = 'ELANGULAR' WHERE idObjek = 'GN-F-064'")
+
+            db.execSQL(
+                """
+                CREATE TABLE habitat_new (
+                    id TEXT PRIMARY KEY,
+                    namaHabitat TEXT NOT NULL,
+                    assetFolder TEXT NOT NULL
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                "INSERT INTO habitat_new (id, namaHabitat, assetFolder) " +
+                    "SELECT id, namaHabitat, assetFolder FROM habitat"
+            )
+            db.execSQL("DROP TABLE habitat")
+            db.execSQL("ALTER TABLE habitat_new RENAME TO habitat")
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    private fun migrateToVersionFive(db: SQLiteDatabase) {
+        db.beginTransaction()
+        try {
+            db.execSQL(
+                """
+                CREATE TABLE objek_flora_fauna_new (
+                    idObjek TEXT PRIMARY KEY,
+                    idHabitat TEXT NOT NULL,
+                    kategori TEXT NOT NULL,
+                    namaObjek TEXT NOT NULL,
+                    kataKunci TEXT NOT NULL,
+                    faktaUnik TEXT NOT NULL,
+                    gambarUtamaPath TEXT NOT NULL,
+                    gambarPasanganPath TEXT NOT NULL,
+                    FOREIGN KEY (idHabitat) REFERENCES habitat (id)
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                INSERT INTO objek_flora_fauna_new (
+                    idObjek, idHabitat, kategori, namaObjek, kataKunci,
+                    faktaUnik, gambarUtamaPath, gambarPasanganPath
+                )
+                SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci,
+                    faktaUnik, gambarUtamaPath, gambarPasanganPath
+                FROM objek_flora_fauna
+                """.trimIndent()
+            )
+            db.execSQL("DROP TABLE objek_flora_fauna")
+            db.execSQL("ALTER TABLE objek_flora_fauna_new RENAME TO objek_flora_fauna")
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
     }
 
     // ── Operasi Habitat ──────────────────────────────────────────────────────
@@ -178,15 +253,14 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getAllHabitatsSync(): List<HabitatEntity> {
         val list = mutableListOf<HabitatEntity>()
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT id, namaHabitat, assetFolder, isUnlocked FROM habitat ORDER BY id ASC", null)
+        val cursor = db.rawQuery("SELECT id, namaHabitat, assetFolder FROM habitat ORDER BY id ASC", null)
         cursor.use {
             while (it.moveToNext()) {
                 list.add(
                     HabitatEntity(
                         id = it.getString(0),
                         namaHabitat = it.getString(1),
-                        assetFolder = it.getString(2),
-                        isUnlocked = it.getInt(3) == 1
+                        assetFolder = it.getString(2)
                     )
                 )
             }
@@ -196,24 +270,16 @@ class SiBekaDatabaseHelper(private val context: Context) :
 
     fun getHabitatById(id: String): HabitatEntity? {
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT id, namaHabitat, assetFolder, isUnlocked FROM habitat WHERE id = ?", arrayOf(id))
+        val cursor = db.rawQuery("SELECT id, namaHabitat, assetFolder FROM habitat WHERE id = ?", arrayOf(id))
         return cursor.use {
             if (it.moveToFirst()) {
                 HabitatEntity(
                     id = it.getString(0),
                     namaHabitat = it.getString(1),
-                    assetFolder = it.getString(2),
-                    isUnlocked = it.getInt(3) == 1
+                    assetFolder = it.getString(2)
                 )
             } else null
         }
-    }
-
-    fun unlockHabitat(id: String) {
-        val db = writableDatabase
-        val values = ContentValues().apply { put("isUnlocked", 1) }
-        db.update("habitat", values, "id = ?", arrayOf(id))
-        _habitatsFlow.value = getAllHabitatsSync()
     }
 
     // ── Operasi Objek Flora Fauna ────────────────────────────────────────────
@@ -222,8 +288,22 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val list = mutableListOf<ObjekEntity>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath, fileSuaraPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
+            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
             arrayOf(habitatId, count.toString())
+        )
+        cursor.use {
+            while (it.moveToNext()) {
+                list.add(cursorToObjek(it))
+            }
+        }
+        return list
+    }
+
+    fun getAllObjekSync(): List<ObjekEntity> {
+        val list = mutableListOf<ObjekEntity>()
+        val cursor = readableDatabase.rawQuery(
+            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna ORDER BY idHabitat, namaObjek",
+            null
         )
         cursor.use {
             while (it.moveToNext()) {
@@ -239,9 +319,9 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val placeholders = excludeIds.joinToString(",") { "?" }
         val args = (listOf(habitatId) + excludeIds + listOf(count.toString())).toTypedArray()
         val query = if (excludeIds.isEmpty()) {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath, fileSuaraPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
+            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
         } else {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath, fileSuaraPath FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
+            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
         }
         val cursor = db.rawQuery(query, args)
         cursor.use {
@@ -255,7 +335,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getObjekById(id: String): ObjekEntity? {
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath, fileSuaraPath FROM objek_flora_fauna WHERE idObjek = ?",
+            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idObjek = ?",
             arrayOf(id)
         )
         return cursor.use {
@@ -272,8 +352,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
             kataKunci = cursor.getString(4),
             faktaUnik = cursor.getString(5),
             gambarUtamaPath = cursor.getString(6),
-            gambarPasanganPath = cursor.getString(7),
-            fileSuaraPath = cursor.getString(8)
+            gambarPasanganPath = cursor.getString(7)
         )
     }
 
@@ -305,13 +384,13 @@ class SiBekaDatabaseHelper(private val context: Context) :
         }
     }
 
-    fun catatPenemuan(idObjek: String) {
+    fun catatPenemuan(idObjek: String): Boolean {
         val db = writableDatabase
         val values = ContentValues().apply {
             put("idObjek", idObjek)
             put("waktuDitemukan", System.currentTimeMillis())
         }
-        db.insertWithOnConflict("buku_koleksi", null, values, SQLiteDatabase.CONFLICT_IGNORE)
-        _koleksiFlow.value = getAllKoleksiSync()
+        val inserted = db.insertWithOnConflict("buku_koleksi", null, values, SQLiteDatabase.CONFLICT_IGNORE) != -1L
+        return inserted
     }
 }

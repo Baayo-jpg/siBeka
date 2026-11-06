@@ -14,7 +14,8 @@ import java.io.IOException
 class SfxPlayer(private val context: Context) {
 
     private val soundPool: SoundPool
-    private var isMuted: Boolean = false
+    @Volatile
+    private var isMuted: Boolean = true
 
     private var soundClickId: Int = 0
     private var soundBenarId: Int = 0
@@ -22,9 +23,10 @@ class SfxPlayer(private val context: Context) {
     private var soundKoinId: Int = 0
     private var soundBintangId: Int = 0
 
-    private val toneGen: ToneGenerator by lazy {
+    private val toneGeneratorDelegate = lazy {
         ToneGenerator(AudioManager.STREAM_MUSIC, 80)
     }
+    private val toneGen by toneGeneratorDelegate
 
     init {
         val audioAttributes = AudioAttributes.Builder()
@@ -50,8 +52,7 @@ class SfxPlayer(private val context: Context) {
 
     private fun loadFromAsset(assetPath: String): Int {
         return try {
-            val afd = context.assets.openFd(assetPath)
-            soundPool.load(afd, 1)
+            context.assets.openFd(assetPath).use { afd -> soundPool.load(afd, 1) }
         } catch (e: IOException) {
             0 // Belum ada file, fallback ke synth tone
         }
@@ -107,6 +108,7 @@ class SfxPlayer(private val context: Context) {
     }
 
     fun release() {
+        if (toneGeneratorDelegate.isInitialized()) toneGen.release()
         soundPool.release()
     }
 }

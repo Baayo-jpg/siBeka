@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.log
+hs_err_pid*.log
+/scratch_sheet.csv
+/.idea/deploymentTargetSelector.xml
+/.idea/planningMode.xml

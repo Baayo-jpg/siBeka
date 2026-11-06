@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
                         startDestination = "splash",
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // 1. Splash Screen
                         composable("splash") {
                             SplashScreen(
                                 onSplashFinished = {
@@ -61,86 +60,78 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                    // 2. Sambutan / Input Nama
-                    composable("sambutan") {
-                        SambutanScreen(
-                            onMulaiPetualangan = {
-                                navController.navigate("peta") {
-                                    popUpTo("sambutan") { inclusive = true }
+                        composable("sambutan") {
+                            SambutanScreen(
+                                onMulaiPetualangan = {
+                                    navController.navigate("peta") {
+                                        popUpTo("sambutan") { inclusive = true }
+                                    }
                                 }
-                            }
-                        )
-                    }
-
-                    // 3. Peta 5 Habitat
-                    composable("peta") {
-                        PetaScreen(
-                            onPilihHabitat = { habitatId ->
-                                navController.navigate("level/$habitatId")
-                            },
-                            onBukaKoleksi = { navController.keTab("koleksi") },
-                            onBukaToko = { navController.keTab("toko") }
-                        )
-                    }
-
-                    // 4. Jalur Level / Pilihan Mode Kuis
-                    composable(
-                        route = "level/{habitatId}",
-                        arguments = listOf(navArgument("habitatId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val habitatId = backStackEntry.arguments?.getString("habitatId") ?: "HH"
-                        LevelSelectScreen(
-                            habitatId = habitatId,
-                            onKembali = { navController.popBackStack() },
-                            onMulaiModeKuis = { habId, mode ->
-                                navController.navigate("kuis/$habId/${mode.name}")
-                            }
-                        )
-                    }
-
-                    // 5. Layar Kuis
-                    composable(
-                        route = "kuis/{habitatId}/{modeKuis}",
-                        arguments = listOf(
-                            navArgument("habitatId") { type = NavType.StringType },
-                            navArgument("modeKuis") { type = NavType.StringType }
-                        )
-                    ) { backStackEntry ->
-                        val habitatId = backStackEntry.arguments?.getString("habitatId") ?: "HH"
-                        val modeStr = backStackEntry.arguments?.getString("modeKuis") ?: ModeKuis.SUSUN_HURUF.name
-                        val modeKuis = try {
-                            ModeKuis.valueOf(modeStr)
-                        } catch (e: Exception) {
-                            ModeKuis.SUSUN_HURUF
+                            )
                         }
 
-                        KuisScreen(
-                            habitatId = habitatId,
-                            modeKuis = modeKuis,
-                            onKeluarKuis = { navController.popBackStack() }
-                        )
-                    }
+                        composable("peta") {
+                            PetaScreen(
+                                onPilihHabitat = { habitatId ->
+                                    navController.navigate("level/$habitatId")
+                                },
+                                onBukaKoleksi = { navController.keTab("koleksi") },
+                                onBukaToko = { navController.keTab("toko") }
+                            )
+                        }
 
-                    // 6. Buku Koleksi
-                    composable("koleksi") {
-                        KoleksiScreen(
-                            onBukaPeta = { navController.keTab("peta") },
-                            onBukaToko = { navController.keTab("toko") }
-                        )
-                    }
+                        composable(
+                            route = "level/{habitatId}",
+                            arguments = listOf(navArgument("habitatId") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val habitatId = backStackEntry.arguments?.getString("habitatId") ?: "HH"
+                            LevelSelectScreen(
+                                habitatId = habitatId,
+                                onKembali = { navController.popBackStack() },
+                                onMulaiModeKuis = { habId, mode ->
+                                    navController.navigate("kuis/$habId/${mode.name}")
+                                }
+                            )
+                        }
 
-                    // 7. Toko Maskot
-                    composable("toko") {
-                        TokoScreen(
-                            onBukaPeta = { navController.keTab("peta") },
-                            onBukaKoleksi = { navController.keTab("koleksi") }
-                        )
+                        composable(
+                            route = "kuis/{habitatId}/{modeKuis}",
+                            arguments = listOf(
+                                navArgument("habitatId") { type = NavType.StringType },
+                                navArgument("modeKuis") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val habitatId = backStackEntry.arguments?.getString("habitatId") ?: "HH"
+                            val modeStr = backStackEntry.arguments?.getString("modeKuis")
+                                ?: ModeKuis.SUSUN_HURUF.name
+                            val modeKuis = ModeKuis.entries.firstOrNull { it.name == modeStr }
+                                ?: ModeKuis.SUSUN_HURUF
+
+                            KuisScreen(
+                                habitatId = habitatId,
+                                modeKuis = modeKuis,
+                                onKeluarKuis = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("koleksi") {
+                            KoleksiScreen(
+                                onBukaPeta = { navController.keTab("peta") },
+                                onBukaToko = { navController.keTab("toko") }
+                            )
+                        }
+
+                        composable("toko") {
+                            TokoScreen(
+                                onBukaPeta = { navController.keTab("peta") },
+                                onBukaKoleksi = { navController.keTab("koleksi") }
+                            )
+                        }
                     }
                 }
             }
         }
     }
-}
 }
 
 /** Pindah antar tab bawah (Peta / Koleksi / Toko) tanpa menumpuk back stack. */

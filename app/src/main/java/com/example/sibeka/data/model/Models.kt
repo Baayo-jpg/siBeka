@@ -7,8 +7,7 @@ package com.example.sibeka.data.model
 data class Habitat(
     val id: String,           // "HH", "LT", "SG", "RW", "GN"
     val namaHabitat: String,  // "Hutan Hujan", "Laut", dll.
-    val assetFolder: String,  // Nama folder di assets/ (e.g. "hutan_hujan_tropis")
-    val isUnlocked: Boolean = false
+    val assetFolder: String  // Nama folder di assets/ (e.g. "hutan_hujan_tropis")
 )
 
 /**
@@ -23,8 +22,7 @@ data class ObjekFloraFauna(
     val kataKunci: String,        // "BERUANG" (untuk susun huruf)
     val faktaUnik: String,        // "Beruang madu adalah beruang terkecil..."
     val gambarUtamaPath: String,  // "hutan_hujan_tropis/fauna/beruang_madu.svg"
-    val gambarPasanganPath: String, // "hutan_hujan_tropis/pasangan/pasangan_madu.svg"
-    val fileSuaraPath: String = ""  // "audio/fauna/beruang_madu.mp3" (opsional)
+    val gambarPasanganPath: String // "hutan_hujan_tropis/pasangan/pasangan_madu.svg"
 )
 
 /**
@@ -45,8 +43,7 @@ data class ProgresPemain(
     val namaPemain: String = "",
     val totalKoin: Int = 0,
     val totalBintang: Int = 0,
-    val aksesoriAktif: String = "",   // e.g. "topi_petualang"
-    val habitatUnlocked: Set<String> = setOf("HH") // Hutan Hujan terbuka default
+    val aksesoriAktif: String = ""   // e.g. "topi_petualang"
 )
 
 /**

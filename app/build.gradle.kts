@@ -11,16 +11,37 @@ android {
         applicationId = "com.example.sibeka"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Keystore rilis disimpan di luar repositori dan hanya diaktifkan dengan environment variables.
+    val releaseStoreFile = providers.environmentVariable("SIBEKA_RELEASE_STORE_FILE").orNull
+    val releaseStorePassword = providers.environmentVariable("SIBEKA_RELEASE_STORE_PASSWORD").orNull
+    val releaseKeyAlias = providers.environmentVariable("SIBEKA_RELEASE_KEY_ALIAS").orNull
+    val releaseKeyPassword = providers.environmentVariable("SIBEKA_RELEASE_KEY_PASSWORD").orNull
+
     buildTypes {
         release {
-            optimization {
-                enable = false
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            if (
+                releaseStoreFile != null &&
+                releaseStorePassword != null &&
+                releaseKeyAlias != null &&
+                releaseKeyPassword != null
+            ) {
+                signingConfig = signingConfigs.create("release") {
+                    storeFile = file(releaseStoreFile)
+                    storePassword = releaseStorePassword
+                    keyAlias = releaseKeyAlias
+                    keyPassword = releaseKeyPassword
+                }
             }
         }
     }
@@ -31,7 +52,6 @@ android {
     buildFeatures {
         compose = true
     }
-    // Paksa portrait mode — kunci orientasi layar
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -64,9 +84,6 @@ dependencies {
 
     // Gson — parse seed_data.json saat pre-populate database
     implementation(libs.gson)
-
-    // Splash Screen API
-    implementation(libs.splashscreen)
 
     // Testing
     testImplementation(libs.junit)

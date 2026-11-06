@@ -17,7 +17,6 @@ class DataStoreManager(private val context: Context) {
         val KEY_BINTANG = intPreferencesKey("total_bintang")
         val KEY_AKSESORI_AKTIF = stringPreferencesKey("aksesori_aktif")
         val KEY_AKSESORI_TERBELI = stringSetPreferencesKey("aksesori_terbeli")
-        val KEY_BGM_MUTED = booleanPreferencesKey("bgm_muted")
         val KEY_SFX_MUTED = booleanPreferencesKey("sfx_muted")
     }
 
@@ -26,7 +25,6 @@ class DataStoreManager(private val context: Context) {
     val totalBintang: Flow<Int> = context.dataStore.data.map { it[KEY_BINTANG] ?: 0 }
     val aksesoriAktif: Flow<String> = context.dataStore.data.map { it[KEY_AKSESORI_AKTIF] ?: "default" }
     val aksesoriTerbeli: Flow<Set<String>> = context.dataStore.data.map { it[KEY_AKSESORI_TERBELI] ?: setOf("default") }
-    val bgmMuted: Flow<Boolean> = context.dataStore.data.map { it[KEY_BGM_MUTED] ?: false }
     val sfxMuted: Flow<Boolean> = context.dataStore.data.map { it[KEY_SFX_MUTED] ?: false }
 
     suspend fun simpanNamaPemain(nama: String) {
@@ -77,10 +75,6 @@ class DataStoreManager(private val context: Context) {
             }
         }
         return berhasil
-    }
-
-    suspend fun toggleBgm(muted: Boolean) {
-        context.dataStore.edit { it[KEY_BGM_MUTED] = muted }
     }
 
     suspend fun toggleSfx(muted: Boolean) {

@@ -17,9 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.VolumeUp
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Place
@@ -51,7 +49,6 @@ fun KoleksiScreen(
     val repository = SiBekaApp.instance.container.repository
     val dataStore = repository.dataStore
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
-    val audioManager = SiBekaApp.instance.container.audioManager
 
     val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
     val koleksiList by repository.getAllKoleksi().collectAsState(initial = emptyList())
@@ -64,11 +61,7 @@ fun KoleksiScreen(
     var selectedObjek by remember { mutableStateOf<ObjekEntity?>(null) }
 
     LaunchedEffect(Unit) {
-        val list = mutableListOf<ObjekEntity>()
-        for (h in listOf("HH", "LT", "SG", "RW", "GN")) {
-            list.addAll(repository.getSoalByHabitat(h, 15))
-        }
-        allObjek = list
+        allObjek = repository.getAllObjek()
     }
 
     val filteredObjek = remember(selectedHabitatId, allObjek) {
@@ -85,10 +78,7 @@ fun KoleksiScreen(
             namaHabitat = namaHabitatDari(detail.idHabitat),
             totalKoin = totalKoin,
             totalBintang = totalBintang,
-            onKembali = { sfxPlayer.playClick(); selectedObjek = null },
-            onPlayAudio = {
-                if (detail.fileSuaraPath.isNotBlank()) audioManager.playSuaraFauna(detail.fileSuaraPath)
-            }
+            onKembali = { sfxPlayer.playClick(); selectedObjek = null }
         )
         return
     }
@@ -226,8 +216,7 @@ private fun DetailKoleksi(
     namaHabitat: String,
     totalKoin: Int,
     totalBintang: Int,
-    onKembali: () -> Unit,
-    onPlayAudio: () -> Unit
+    onKembali: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -283,25 +272,6 @@ private fun DetailKoleksi(
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Icon(Icons.Outlined.Place, null, tint = BiruLaut, modifier = Modifier.size(15.dp))
                         Text(namaHabitat, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BiruLaut)
-                    }
-                }
-            }
-
-            if (objek.fileSuaraPath.isNotBlank()) {
-                KartuSiBeka(Modifier.fillMaxWidth(), container = BiruPucat, borderColor = BiruPucat, shape = RoundedCornerShape(18.dp), onClick = onPlayAudio) {
-                    Row(
-                        Modifier.fillMaxWidth().padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(Modifier.size(46.dp).clip(CircleShape).background(HijauTua), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.PlayArrow, "Putar", tint = PutihBersih, modifier = Modifier.size(26.dp))
-                        }
-                        Column(Modifier.weight(1f)) {
-                            Text("Dengarkan suaranya", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                            Text("Ketuk untuk memutar suara ${objek.namaObjek}", fontSize = 11.sp, color = BiruLaut, fontWeight = FontWeight.SemiBold)
-                        }
-                        Icon(Icons.AutoMirrored.Outlined.VolumeUp, null, tint = BiruLaut, modifier = Modifier.size(22.dp))
                     }
                 }
             }

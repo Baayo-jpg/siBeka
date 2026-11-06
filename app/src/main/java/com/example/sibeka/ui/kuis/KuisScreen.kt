@@ -8,7 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Backspace
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Eco
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sibeka.data.db.ObjekEntity
@@ -78,6 +79,7 @@ fun KuisScreen(
 
     if (uiState.isKuisSelesai) {
         HasilScreen(
+            jawabanBenar = uiState.jawabanBenar,
             bintangDidapat = uiState.totalBintang,
             skorTotal = uiState.skorSesi,
             totalSoal = uiState.daftarSoal.size,
@@ -87,9 +89,35 @@ fun KuisScreen(
         return
     }
 
-    if (uiState.isLoading || uiState.daftarSoal.isEmpty()) {
+    if (uiState.isLoading) {
         Box(Modifier.fillMaxSize().background(LatarKrem), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = HijauUtama)
+        }
+        return
+    }
+
+    if (uiState.daftarSoal.isEmpty()) {
+        Box(
+            Modifier.fillMaxSize().background(LatarKrem).padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("Soal belum tersedia", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                Text(
+                    "Belum ada spesies bergambar yang bisa dimainkan di habitat ini.",
+                    fontSize = 14.sp,
+                    color = AbuTua,
+                    textAlign = TextAlign.Center
+                )
+                TombolSekunder(
+                    "Kembali",
+                    onClick = onKeluarKuis,
+                    icon = Icons.AutoMirrored.Filled.ArrowBack
+                )
+            }
         }
         return
     }

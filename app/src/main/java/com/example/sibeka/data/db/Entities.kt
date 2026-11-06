@@ -3,8 +3,7 @@ package com.example.sibeka.data.db
 data class HabitatEntity(
     val id: String,
     val namaHabitat: String,
-    val assetFolder: String,
-    val isUnlocked: Boolean = false
+    val assetFolder: String
 )
 
 data class ObjekEntity(
@@ -15,8 +14,7 @@ data class ObjekEntity(
     val kataKunci: String,        // Kata untuk mode susun huruf
     val faktaUnik: String,
     val gambarUtamaPath: String,  // Relatif dari assets/
-    val gambarPasanganPath: String,
-    val fileSuaraPath: String = ""
+    val gambarPasanganPath: String
 )
 
 data class KoleksiEntity(

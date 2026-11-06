@@ -10,7 +10,11 @@ import com.example.sibeka.data.model.StatusJawaban
 import com.example.sibeka.data.repository.SiBekaRepository
 import com.example.sibeka.util.SfxPlayer
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+
+internal fun skorJawaban(mode: ModeKuis, poinPotonganTersisa: Int): Int =
+    if (mode == ModeKuis.POTONGAN_GAMBAR) poinPotonganTersisa else 100
 
 data class KuisUiState(
     val isLoading: Boolean = true,
@@ -21,6 +25,7 @@ data class KuisUiState(
     val currentSoalIndex: Int = 0,
     val statusJawaban: StatusJawaban = StatusJawaban.BELUM,
     val totalBintang: Int = 0,
+    val jawabanBenar: Int = 0,
     val skorSesi: Int = 0,
     val isKuisSelesai: Boolean = false,
     // State khusus Mode Susun Huruf
@@ -40,6 +45,8 @@ class KuisViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KuisUiState())
+    private var rewardJob: Job? = null
+    private var advanceJob: Job? = null
     val uiState: StateFlow<KuisUiState> = _uiState.asStateFlow()
 
     val totalKoin: StateFlow<Int> = repository.dataStore.totalKoin
@@ -50,7 +57,17 @@ class KuisViewModel(
 
     fun mulaiKuis(habitatId: String, mode: ModeKuis) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, habitatId = habitatId, modeKuis = mode) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    habitatId = habitatId,
+                    modeKuis = mode,
+                    daftarSoal = emptyList(),
+                    currentSoalIndex = 0,
+                    statusJawaban = StatusJawaban.BELUM,
+                    isKuisSelesai = false
+                )
+            }
             val habitat = repository.getHabitatById(habitatId)
             val namaHab = habitat?.namaHabitat ?: "Habitat"
 
@@ -64,6 +81,7 @@ class KuisViewModel(
                         currentSoalIndex = 0,
                         statusJawaban = StatusJawaban.BELUM,
                         totalBintang = 0,
+                        jawabanBenar = 0,
                         skorSesi = 0,
                         isKuisSelesai = false
                     )
@@ -196,41 +214,49 @@ class KuisViewModel(
 
     private fun evaluasiJawaban(isBenar: Boolean) {
         val soal = currentSoal ?: return
-        viewModelScope.launch {
-            if (isBenar) {
-                sfxPlayer.playBenar()
-                repository.catatPenemuan(soal.idObjek)
-                repository.dataStore.tambahKoin(20)
-                repository.dataStore.tambahBintang(1)
+        if (_uiState.value.statusJawaban != StatusJawaban.BELUM) return
 
-                _uiState.update {
-                    it.copy(
-                        statusJawaban = StatusJawaban.BENAR,
-                        totalBintang = it.totalBintang + 1,
-                        skorSesi = it.skorSesi + 100
-                    )
-                }
-            } else {
-                sfxPlayer.playSalah()
-                _uiState.update {
-                    it.copy(statusJawaban = StatusJawaban.SALAH)
+        val state = _uiState.value
+        val status = if (isBenar) StatusJawaban.BENAR else StatusJawaban.SALAH
+        _uiState.update {
+            it.copy(
+                statusJawaban = status,
+                jawabanBenar = if (isBenar) it.jawabanBenar + 1 else it.jawabanBenar,
+                skorSesi = if (isBenar) it.skorSesi + skorJawaban(state.modeKuis, state.poinPotonganTersisa) else it.skorSesi
+            )
+        }
+
+        if (isBenar) {
+            sfxPlayer.playBenar()
+            rewardJob = viewModelScope.launch {
+                if (repository.catatPenemuan(soal.idObjek)) {
+                    repository.dataStore.tambahKoin(20)
+                    repository.dataStore.tambahBintang(1)
+                    _uiState.update { it.copy(totalBintang = it.totalBintang + 1) }
                 }
             }
+        } else {
+            sfxPlayer.playSalah()
         }
     }
 
     fun lanjutKeSoalBerikutnya() {
-        val state = _uiState.value
-        val nextIndex = state.currentSoalIndex + 1
+        if (_uiState.value.statusJawaban == StatusJawaban.BELUM || advanceJob?.isActive == true) return
+        advanceJob = viewModelScope.launch {
+            rewardJob?.join()
+            val state = _uiState.value
+            val nextIndex = state.currentSoalIndex + 1
 
-        if (nextIndex < state.daftarSoal.size) {
-            _uiState.update {
-                it.copy(currentSoalIndex = nextIndex, statusJawaban = StatusJawaban.BELUM)
+            if (nextIndex < state.daftarSoal.size) {
+                _uiState.update {
+                    it.copy(currentSoalIndex = nextIndex, statusJawaban = StatusJawaban.BELUM)
+                }
+                setupSoalAktif()
+            } else {
+                sfxPlayer.playBintang()
+                _uiState.update { it.copy(isKuisSelesai = true) }
             }
-            viewModelScope.launch { setupSoalAktif() }
-        } else {
-            sfxPlayer.playBintang()
-            _uiState.update { it.copy(isKuisSelesai = true) }
+            advanceJob = null
         }
     }
 

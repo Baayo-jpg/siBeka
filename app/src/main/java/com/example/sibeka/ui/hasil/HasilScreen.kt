@@ -29,6 +29,7 @@ import com.example.sibeka.ui.theme.*
 
 @Composable
 fun HasilScreen(
+    jawabanBenar: Int,
     bintangDidapat: Int,
     skorTotal: Int,
     onMainLagi: () -> Unit,
@@ -37,16 +38,14 @@ fun HasilScreen(
 ) {
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
 
-    val skala1 = remember { Animatable(0f) }
-    val skala2 = remember { Animatable(0f) }
-    val skala3 = remember { Animatable(0f) }
+    val skalaBintang = remember { List(5) { Animatable(0f) } }
 
     LaunchedEffect(Unit) {
         sfxPlayer.playBintang()
         val pegas = spring<Float>(dampingRatio = Spring.DampingRatioMediumBouncy)
-        if (bintangDidapat >= 1) skala1.animateTo(1f, pegas)
-        if (bintangDidapat >= 2) skala2.animateTo(1f, pegas)
-        if (bintangDidapat >= 3) skala3.animateTo(1f, pegas)
+        repeat(bintangDidapat.coerceIn(0, skalaBintang.size)) { index ->
+            skalaBintang[index].animateTo(1f, pegas)
+        }
     }
 
     Column(
@@ -58,23 +57,23 @@ fun HasilScreen(
         PillLabel("LEVEL SELESAI!", icon = Icons.Outlined.Flag)
 
         Text("Hebat, penjelajah!", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua, textAlign = TextAlign.Center)
-        Text("Rasa ingin tahumu membawa hadiah baru.", fontSize = 13.sp, color = AbuTua, textAlign = TextAlign.Center)
+        Text("Kamu telah menyelesaikan tantangan habitat.", fontSize = 13.sp, color = AbuTua, textAlign = TextAlign.Center)
 
         // Bintang di atas maskot
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Bottom) {
-            BintangHasil(1, bintangDidapat, skala1.value, 48)
-            BintangHasil(2, bintangDidapat, skala2.value, 62)
-            BintangHasil(3, bintangDidapat, skala3.value, 48)
+            skalaBintang.forEachIndexed { index, skala ->
+                BintangHasil(index + 1, bintangDidapat, skala.value, 36)
+            }
         }
+        Text("Bintang spesies baru: $bintangDidapat", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = AbuTua)
         Box(Modifier.size(190.dp).clip(CircleShape).background(HijauBenarMuda), contentAlignment = Alignment.Center) {
             MaskotSiBeka(size = 150.dp, melompat = true)
         }
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            KartuStat("$bintangDidapat / $totalSoal", "Bintang didapat", PutihBersih, HitamLembut, GarisKartu, Modifier.weight(1f))
-            KartuStat("+${bintangDidapat * 20}", "Koin petualangan", KuningMuda, CoklatTua, KuningMuda, Modifier.weight(1f))
+            KartuStat("$jawabanBenar / $totalSoal", "Jawaban benar", PutihBersih, HitamLembut, GarisKartu, Modifier.weight(1f))
+            KartuStat("$skorTotal", "Skor sesi (poin)", KuningMuda, CoklatTua, KuningMuda, Modifier.weight(1f))
         }
-        Text("Skor sesi: $skorTotal poin", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = AbuTua)
 
         Spacer(Modifier.height(4.dp))
 

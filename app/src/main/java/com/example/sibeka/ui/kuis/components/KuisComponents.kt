@@ -191,7 +191,7 @@ fun KartuUmpanBalik(
                 }
             }
             if (benar) {
-                Text("★ +1 bintang · Disimpan saat level selesai", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = HijauBenar)
+                Text("Hadiah hanya untuk spesies yang baru ditemukan", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = HijauBenar)
             }
         }
     }

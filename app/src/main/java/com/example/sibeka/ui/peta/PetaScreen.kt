@@ -39,16 +39,21 @@ fun PetaScreen(
     val repository = SiBekaApp.instance.container.repository
     val dataStore = repository.dataStore
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
-    val audioManager = SiBekaApp.instance.container.audioManager
 
     val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
     val namaPemain by dataStore.namaPemain.collectAsState(initial = "Penjelajah")
     val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
     val totalBintang by dataStore.totalBintang.collectAsState(initial = 0)
-    val bgmMuted by dataStore.bgmMuted.collectAsState(initial = false)
+    val sfxMutedPreference by dataStore.sfxMuted.collectAsState(initial = null)
+    val sfxMuted = sfxMutedPreference ?: false
+    var jumlahSpesiesByHabitat by remember { mutableStateOf<Map<String, Int>?>(null) }
 
-    LaunchedEffect(bgmMuted) {
-        audioManager.setBgmMuted(bgmMuted)
+    LaunchedEffect(sfxMutedPreference) {
+        sfxMutedPreference?.let(sfxPlayer::setMuted)
+    }
+
+    LaunchedEffect(Unit) {
+        jumlahSpesiesByHabitat = repository.getAllObjek().groupingBy { it.idHabitat }.eachCount()
     }
 
     Scaffold(
@@ -56,13 +61,13 @@ fun PetaScreen(
         topBar = {
             HeaderJelajahAlam {
                 TombolIkonBulat(
-                    icon = if (bgmMuted) Icons.AutoMirrored.Outlined.VolumeOff else Icons.AutoMirrored.Outlined.VolumeUp,
+                    icon = if (sfxMuted) Icons.AutoMirrored.Outlined.VolumeOff else Icons.AutoMirrored.Outlined.VolumeUp,
                     deskripsi = "Atur suara",
                     ukuran = 34.dp,
                     onClick = {
                         coroutineScope.launch {
-                            dataStore.toggleBgm(!bgmMuted)
-                            sfxPlayer.setMuted(!bgmMuted)
+                            dataStore.toggleSfx(!sfxMuted)
+                            sfxPlayer.setMuted(!sfxMuted)
                         }
                     }
                 )
@@ -92,7 +97,11 @@ fun PetaScreen(
             }
             item { HabitatMapBanner() }
             items(habitats) { habitat ->
-                HabitatCard(habitat = habitat, onClick = { sfxPlayer.playClick(); onPilihHabitat(habitat.id) })
+                HabitatCard(
+                    habitat = habitat,
+                    jumlahSpesies = jumlahSpesiesByHabitat?.get(habitat.id),
+                    onClick = { sfxPlayer.playClick(); onPilihHabitat(habitat.id) }
+                )
             }
             item { BubbleSiBeka("Kita lanjut menjelajah, yuk! Masih banyak teman yang bisa ditemukan.") }
         }
@@ -129,7 +138,7 @@ private fun HabitatMapBanner() {
 }
 
 @Composable
-fun HabitatCard(habitat: HabitatEntity, onClick: () -> Unit) {
+fun HabitatCard(habitat: HabitatEntity, jumlahSpesies: Int?, onClick: () -> Unit) {
     val (warnaTema, emojiHabitat, deskripsi) = when (habitat.id) {
         "HH" -> Triple(WarnaHutan, "🌳", "Hutan rimbun kaya flora fauna endemik")
         "LT" -> Triple(WarnaLaut, "🌊", "Kedalaman samudra penuh biota menakjubkan")
@@ -153,7 +162,12 @@ fun HabitatCard(habitat: HabitatEntity, onClick: () -> Unit) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(habitat.namaHabitat, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
                 Text(deskripsi, fontSize = 12.sp, lineHeight = 16.sp, color = AbuTua)
-                Text("15 spesies", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = warnaTema)
+                Text(
+                    jumlahSpesies?.let { "$it spesies" } ?: "Memuat spesies...",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = warnaTema
+                )
             }
 
             Box(Modifier.size(34.dp).clip(CircleShape).background(HijauTua), contentAlignment = Alignment.Center) {
