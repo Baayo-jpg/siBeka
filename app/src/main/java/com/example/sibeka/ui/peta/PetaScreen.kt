@@ -1,37 +1,45 @@
 package com.example.sibeka.ui.peta
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.VolumeOff
 import androidx.compose.material.icons.automirrored.outlined.VolumeUp
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sibeka.SiBekaApp
-import com.example.sibeka.data.db.HabitatEntity
+import com.example.sibeka.data.db.ObjekEntity
+import com.example.sibeka.data.model.ModeKuis
 import com.example.sibeka.ui.components.*
 import com.example.sibeka.ui.theme.*
+import com.example.sibeka.util.GambarAset
 import kotlinx.coroutines.launch
 
+/** Urutan tampil habitat pada jalur belajar. */
+val URUTAN_HABITAT = listOf("GN", "HH", "RW", "SG", "LT")
+
+/** Simpul mode kuis (id mode dipakai untuk navigasi). */
+private val SIMPUL_MODE = listOf(
+    ModeKuis.SUSUN_HURUF to "🔤",
+    ModeKuis.PASANGKAN to "🔗",
+    ModeKuis.POTONGAN_GAMBAR to "🍃"
+)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PetaScreen(
     onPilihHabitat: (habitatId: String) -> Unit,
+    onMulaiKuis: (habitatId: String, mode: ModeKuis) -> Unit,
     onBukaKoleksi: () -> Unit,
     onBukaToko: () -> Unit
 ) {
@@ -41,39 +49,87 @@ fun PetaScreen(
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
 
     val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
-    val namaPemain by dataStore.namaPemain.collectAsState(initial = "Penjelajah")
+    val koleksi by repository.getAllKoleksi().collectAsState(initial = emptyList())
+    val namaPemain by dataStore.namaPemain.collectAsState(initial = "")
     val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
     val totalBintang by dataStore.totalBintang.collectAsState(initial = 0)
     val sfxMutedPreference by dataStore.sfxMuted.collectAsState(initial = null)
     val sfxMuted = sfxMutedPreference ?: false
-    var jumlahSpesiesByHabitat by remember { mutableStateOf<Map<String, Int>?>(null) }
+
+    var semuaObjek by remember { mutableStateOf<List<ObjekEntity>>(emptyList()) }
+    LaunchedEffect(Unit) { semuaObjek = repository.getAllObjek() }
 
     LaunchedEffect(sfxMutedPreference) {
         sfxMutedPreference?.let(sfxPlayer::setMuted)
     }
 
-    LaunchedEffect(Unit) {
-        jumlahSpesiesByHabitat = repository.getAllObjek().groupingBy { it.idHabitat }.eachCount()
+    val habitatTerurut = remember(habitats) {
+        habitats.sortedBy { habitat ->
+            URUTAN_HABITAT.indexOf(habitat.id).let { if (it < 0) URUTAN_HABITAT.size else it }
+        }
+    }
+    val habitatById = remember(semuaObjek) { semuaObjek.associate { it.idObjek to it.idHabitat } }
+    val jumlahByHabitat = remember(semuaObjek) { semuaObjek.groupingBy { it.idHabitat }.eachCount() }
+    val ditemukanByHabitat = remember(koleksi, habitatById) {
+        koleksi.mapNotNull { habitatById[it.idObjek] }.groupingBy { it }.eachCount()
+    }
+
+    // Habitat yang masih punya spesies belum ditemukan menjadi habitat aktif.
+    val habitatAktif = remember(habitatTerurut, jumlahByHabitat, ditemukanByHabitat) {
+        habitatTerurut.firstOrNull { habitat ->
+            val total = jumlahByHabitat[habitat.id] ?: 0
+            (ditemukanByHabitat[habitat.id] ?: 0) < total
+        }?.id ?: habitatTerurut.firstOrNull()?.id
+    }
+
+    val listState = rememberLazyListState()
+
+    // Deteksi habitat aktif berdasarkan koordinat Y item yang sedang berada di bawah header (~20% tinggi layar).
+    // Mendukung scroll turun maupun naik dengan transisi yang akurat.
+    val habitatTerlihatIndex by remember(habitatTerurut) {
+        derivedStateOf {
+            if (habitatTerurut.isEmpty()) return@derivedStateOf 0
+            val viewportH = listState.layoutInfo.viewportSize.height
+            val sampleY = if (viewportH > 0) viewportH * 0.22f else 320f
+
+            var targetHabitatId = habitatTerurut.first().id
+            var maxOffsetBelowSample = Float.NEGATIVE_INFINITY
+
+            for (item in listState.layoutInfo.visibleItemsInfo) {
+                val key = item.key.toString()
+                val habId = when {
+                    key.startsWith("jalur-") -> key.removePrefix("jalur-")
+                    key.startsWith("pemisah-") -> key.removePrefix("pemisah-")
+                    else -> null
+                }
+                if (habId != null && item.offset.toFloat() <= sampleY) {
+                    if (item.offset.toFloat() > maxOffsetBelowSample) {
+                        maxOffsetBelowSample = item.offset.toFloat()
+                        targetHabitatId = habId
+                    }
+                }
+            }
+
+            val idx = habitatTerurut.indexOfFirst { it.id == targetHabitatId }
+            if (idx >= 0) idx else 0
+        }
     }
 
     Scaffold(
         containerColor = LatarKrem,
         topBar = {
-            HeaderJelajahAlam {
-                TombolIkonBulat(
-                    icon = if (sfxMuted) Icons.AutoMirrored.Outlined.VolumeOff else Icons.AutoMirrored.Outlined.VolumeUp,
-                    deskripsi = "Atur suara",
-                    ukuran = 34.dp,
-                    onClick = {
-                        coroutineScope.launch {
-                            dataStore.toggleSfx(!sfxMuted)
-                            sfxPlayer.setMuted(!sfxMuted)
-                        }
+            SapaanAtas(
+                nama = namaPemain.ifBlank { "Penjelajah" },
+                totalBintang = totalBintang,
+                totalKoin = totalKoin,
+                sfxMuted = sfxMuted,
+                onToggleSuara = {
+                    coroutineScope.launch {
+                        dataStore.toggleSfx(!sfxMuted)
+                        sfxPlayer.setMuted(!sfxMuted)
                     }
-                )
-                ChipBintang(totalBintang)
-                ChipKoin(totalKoin)
-            }
+                }
+            )
         },
         bottomBar = {
             SiBekaBottomBar(
@@ -84,95 +140,164 @@ fun PetaScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Mau ke mana hari ini?", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                    Text("Halo, $namaPemain! Lima habitat, banyak teman baru.", fontSize = 13.sp, color = AbuTua)
+        Box(Modifier.fillMaxSize().padding(innerPadding)) {
+            LazyColumn(
+                Modifier.fillMaxSize(),
+                state = listState,
+                // Beri ruang atas untuk header tunggal yang overlay
+                contentPadding = PaddingValues(top = 98.dp, bottom = 24.dp)
+            ) {
+                if (habitatTerurut.isEmpty()) {
+                    item {
+                        Box(Modifier.fillParentMaxHeight(0.6f).padding(24.dp), contentAlignment = Alignment.Center) {
+                            Text("Memuat jalur jelajah...", fontSize = 13.sp, color = AbuTua)
+                        }
+                    }
+                }
+
+                habitatTerurut.forEachIndexed { index, habitat ->
+                    val tema = temaHabitat(habitat.id)
+                    val jumlah = jumlahByHabitat[habitat.id] ?: 0
+                    val ditemukan = ditemukanByHabitat[habitat.id] ?: 0
+                    val lengkap = jumlah > 0 && ditemukan >= jumlah
+
+                    item(key = "jalur-${habitat.id}") {
+                        val simpul = buildList {
+                            SIMPUL_MODE.forEachIndexed { urutanMode, (mode, ikon) ->
+                                add(
+                                    SimpulBelajar(
+                                        id = "mode:${mode.name}",
+                                        ikon = ikon,
+                                        judul = mode.name,
+                                        selesai = lengkap,
+                                        aktif = habitat.id == habitatAktif && urutanMode == 0 && !lengkap,
+                                        aset = "mode_${mode.name.lowercase()}"
+                                    )
+                                )
+                            }
+                            add(
+                                SimpulBelajar(
+                                    id = "koleksi",
+                                    ikon = if (lengkap) "🏆" else "🎁",
+                                    judul = "Koleksi habitat",
+                                    selesai = lengkap,
+                                    aktif = false,
+                                    aset = if (lengkap) "simpul_trofi" else "simpul_hadiah"
+                                )
+                            )
+                        }
+
+                        // Background habitat langsung menyambung tanpa jeda strip pemisah
+                        JalurBelajar(
+                            simpul = simpul,
+                            warna = tema.warna,
+                            modifier = Modifier.fillMaxWidth(),
+                            idHabitat = habitat.id,
+                            namaHabitat = if (index > 0) namaTampilHabitat(habitat.id, habitat.namaHabitat) else null
+                        ) { dipilih ->
+                            sfxPlayer.playClick()
+                            val mode = SIMPUL_MODE.firstOrNull { "mode:${it.first.name}" == dipilih.id }?.first
+                            if (mode != null) onMulaiKuis(habitat.id, mode) else onPilihHabitat(habitat.id)
+                        }
+                    }
+                }
+
+                item {
+                    Box(Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
+                        BubbleSiBeka("Kita lanjut menjelajah, yuk! Masih banyak teman yang bisa ditemukan.")
+                    }
                 }
             }
-            item { HabitatMapBanner() }
-            items(habitats) { habitat ->
-                HabitatCard(
-                    habitat = habitat,
-                    jumlahSpesies = jumlahSpesiesByHabitat?.get(habitat.id),
-                    onClick = { sfxPlayer.playClick(); onPilihHabitat(habitat.id) }
-                )
+
+            // Header tunggal overlay di atas LazyColumn — berubah dengan animasi halus saat scroll
+            if (habitatTerurut.isNotEmpty()) {
+                val idx = habitatTerlihatIndex.coerceIn(0, habitatTerurut.lastIndex)
+
+                AnimatedContent(
+                    targetState = idx,
+                    transitionSpec = {
+                        if (targetState > initialState) {
+                            (slideInVertically { height -> height / 2 } + fadeIn()) togetherWith
+                                    (slideOutVertically { height -> -height / 2 } + fadeOut())
+                        } else {
+                            (slideInVertically { height -> -height / 2 } + fadeIn()) togetherWith
+                                    (slideOutVertically { height -> height / 2 } + fadeOut())
+                        }
+                    },
+                    label = "header-anim"
+                ) { targetIdx ->
+                    val hab = habitatTerurut[targetIdx]
+                    val tm = temaHabitat(hab.id)
+                    val jml = jumlahByHabitat[hab.id] ?: 0
+                    val dtk = ditemukanByHabitat[hab.id] ?: 0
+
+                    BannerHabitat(
+                        nomor = targetIdx + 1,
+                        totalHabitat = habitatTerurut.size,
+                        namaHabitat = hab.namaHabitat,
+                        tema = tm,
+                        ditemukan = dtk,
+                        jumlahSpesies = jml,
+                        habitatId = hab.id,
+                        onBukaPanduan = {
+                            sfxPlayer.playClick()
+                            onBukaKoleksi()
+                        }
+                    )
+                }
             }
-            item { BubbleSiBeka("Kita lanjut menjelajah, yuk! Masih banyak teman yang bisa ditemukan.") }
         }
     }
 }
 
 @Composable
-private fun HabitatMapBanner() {
-    Box(
-        Modifier.fillMaxWidth().height(240.dp).clip(RoundedCornerShape(24.dp))
-            .background(MaskotLatar).border(1.dp, GarisKartu, RoundedCornerShape(24.dp))
-            .semantics { contentDescription = "Peta habitat Indonesia" },
-        contentAlignment = Alignment.Center
+private fun SapaanAtas(
+    nama: String,
+    totalBintang: Int,
+    totalKoin: Int,
+    sfxMuted: Boolean,
+    onToggleSuara: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(LatarKrem)
+            .statusBarsPadding()
+            .padding(start = 20.dp, end = 16.dp, top = 8.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("🗺️", fontSize = 48.sp)
+        GambarAset(
+            nama = "berpikir_kecil",
+            cadangan = "🐒",
+            modifier = Modifier.size(40.dp),
+            ukuranCadangan = 31.sp
+        )
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
             Text(
-                text = "Peta Habitat Indonesia",
-                fontSize = 18.sp,
+                "HALO, PENJELAJAH",
+                fontSize = 9.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = HijauTua
+                color = AbuTua,
+                letterSpacing = 0.8.sp
             )
             Text(
-                text = "Jelajahi keanekaragaman hayati Nusantara!",
-                fontSize = 12.sp,
-                color = AbuTua
+                nama,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = HijauTua,
+                maxLines = 1
             )
         }
-    }
-}
-
-@Composable
-fun HabitatCard(habitat: HabitatEntity, jumlahSpesies: Int?, onClick: () -> Unit) {
-    val (warnaTema, emojiHabitat, deskripsi) = when (habitat.id) {
-        "HH" -> Triple(WarnaHutan, "🌳", "Hutan rimbun kaya flora fauna endemik")
-        "LT" -> Triple(WarnaLaut, "🌊", "Kedalaman samudra penuh biota menakjubkan")
-        "SG" -> Triple(WarnaSungai, "🛶", "Arus air tawar tempat pesut & ikan endemik")
-        "RW" -> Triple(WarnaRawa, "🌿", "Lahan basah gambut rumah bagi bekantan")
-        "GN" -> Triple(WarnaGunung, "⛰️", "Puncak berkabut dengan satwa unik dataran tinggi")
-        else -> Triple(HijauUtama, "🌍", "Habitat alam lestari")
-    }
-
-    KartuSiBeka(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), onClick = onClick) {
-        Row(
-            Modifier.fillMaxWidth().padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Box(
-                Modifier.size(60.dp).clip(RoundedCornerShape(18.dp)).background(warnaTema.copy(alpha = 0.14f)),
-                contentAlignment = Alignment.Center
-            ) { Text(emojiHabitat, fontSize = 30.sp) }
-
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(habitat.namaHabitat, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                Text(deskripsi, fontSize = 12.sp, lineHeight = 16.sp, color = AbuTua)
-                Text(
-                    jumlahSpesies?.let { "$it spesies" } ?: "Memuat spesies...",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = warnaTema
-                )
-            }
-
-            Box(Modifier.size(34.dp).clip(CircleShape).background(HijauTua), contentAlignment = Alignment.Center) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Buka", tint = PutihBersih, modifier = Modifier.size(22.dp))
-            }
-        }
+        TombolIkonBulat(
+            icon = if (sfxMuted) Icons.AutoMirrored.Outlined.VolumeOff else Icons.AutoMirrored.Outlined.VolumeUp,
+            deskripsi = "Atur suara",
+            ukuran = 34.dp,
+            onClick = onToggleSuara
+        )
+        Spacer(Modifier.width(6.dp))
+        ChipBintang(totalBintang)
+        Spacer(Modifier.width(6.dp))
+        ChipKoin(totalKoin)
     }
 }

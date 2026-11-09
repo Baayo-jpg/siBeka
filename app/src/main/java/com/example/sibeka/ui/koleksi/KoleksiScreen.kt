@@ -38,6 +38,7 @@ import coil.compose.AsyncImage
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.db.ObjekEntity
 import com.example.sibeka.ui.components.*
+import com.example.sibeka.ui.peta.URUTAN_HABITAT
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.AssetImageLoader
 
@@ -51,6 +52,9 @@ fun KoleksiScreen(
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
 
     val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
+    val habitatTerurut = remember(habitats) {
+        habitats.sortedBy { h -> URUTAN_HABITAT.indexOf(h.id).let { if (it < 0) URUTAN_HABITAT.size else it } }
+    }
     val koleksiList by repository.getAllKoleksi().collectAsState(initial = emptyList())
     val collectedIds = remember(koleksiList) { koleksiList.map { it.idObjek }.toSet() }
     val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
@@ -132,7 +136,7 @@ fun KoleksiScreen(
                     item {
                         ChipFilter("Semua · $ditemukan", selectedHabitatId == "SEMUA") { selectedHabitatId = "SEMUA" }
                     }
-                    items(habitats) { h ->
+                    items(habitatTerurut) { h ->
                         val n = allObjek.count { it.idHabitat == h.id && it.idObjek in collectedIds }
                         ChipFilter("${h.namaHabitat} · $n", selectedHabitatId == h.id) { selectedHabitatId = h.id }
                     }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sibeka.ui.theme.*
+import com.example.sibeka.util.GambarAset
 
 enum class TabUtama { PETA, KOLEKSI, TOKO }
 
@@ -49,7 +50,7 @@ fun MaskotSiBeka(modifier: Modifier = Modifier, size: Dp = 48.dp, melompat: Bool
         label = "naik"
     )
     Box(modifier.size(size).offset(y = naik.dp), contentAlignment = Alignment.Center) {
-        Text("🐒", fontSize = (size.value * 0.78f).sp)
+        GambarAset("maskot", "🐒", Modifier.fillMaxSize(), ukuranCadangan = (size.value * 0.78f).sp)
     }
 }
 

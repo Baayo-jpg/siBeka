@@ -75,6 +75,9 @@ class MainActivity : ComponentActivity() {
                                 onPilihHabitat = { habitatId ->
                                     navController.navigate("level/$habitatId")
                                 },
+                                onMulaiKuis = { habitatId, mode ->
+                                    navController.navigate("kuis/$habitatId/${mode.name}")
+                                },
                                 onBukaKoleksi = { navController.keTab("koleksi") },
                                 onBukaToko = { navController.keTab("toko") }
                             )
