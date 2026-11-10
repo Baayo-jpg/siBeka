@@ -3,17 +3,21 @@ package com.example.sibeka.ui.peta
 import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.VolumeOff
 import androidx.compose.material.icons.automirrored.outlined.VolumeUp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -263,41 +267,38 @@ private fun SapaanAtas(
             .fillMaxWidth()
             .background(LatarKrem)
             .statusBarsPadding()
-            .padding(start = 20.dp, end = 16.dp, top = 8.dp, bottom = 10.dp),
+            .padding(start = 20.dp, end = 16.dp, top = 4.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         GambarAset(
             nama = "berpikir_kecil",
             cadangan = "🐒",
-            modifier = Modifier.size(40.dp),
-            ukuranCadangan = 31.sp
+            modifier = Modifier.size(28.dp),
+            ukuranCadangan = 22.sp
         )
-        Spacer(Modifier.width(10.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                "HALO, PENJELAJAH",
-                fontSize = 9.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = AbuTua,
-                letterSpacing = 0.8.sp
-            )
-            Text(
-                nama,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = HijauTua,
-                maxLines = 1
+        Spacer(Modifier.width(8.dp))
+        Text(
+            nama,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = HijauTua,
+            maxLines = 1,
+            modifier = Modifier.weight(1f)
+        )
+        // Tombol suara tanpa kotak, hanya ikon agar header tetap ringan.
+        Box(
+            Modifier.size(30.dp).clip(CircleShape).clickable(onClick = onToggleSuara),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = if (sfxMuted) Icons.AutoMirrored.Outlined.VolumeOff
+                else Icons.AutoMirrored.Outlined.VolumeUp,
+                contentDescription = "Atur suara",
+                tint = AbuTua,
+                modifier = Modifier.size(19.dp)
             )
         }
-        TombolIkonBulat(
-            icon = if (sfxMuted) Icons.AutoMirrored.Outlined.VolumeOff else Icons.AutoMirrored.Outlined.VolumeUp,
-            deskripsi = "Atur suara",
-            ukuran = 34.dp,
-            onClick = onToggleSuara
-        )
         Spacer(Modifier.width(6.dp))
-        ChipBintang(totalBintang)
-        Spacer(Modifier.width(6.dp))
-        ChipKoin(totalKoin)
+        ChipStatistik(bintang = totalBintang, koin = totalKoin)
     }
 }

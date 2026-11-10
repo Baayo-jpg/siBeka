@@ -19,6 +19,11 @@ data class ObjekFloraFauna(
     val idHabitat: String,        // FK ke Habitat.id
     val kategori: String,         // "fauna" atau "flora"
     val namaObjek: String,        // "Beruang Madu"
+    val namaLatin: String,
+    val namaInternasional: String,
+    val ciriCiri: String,
+    val sebaran: String,
+    val statusKonservasi: String,
     val kataKunci: String,        // "BERUANG" (untuk susun huruf)
     val faktaUnik: String,        // "Beruang madu adalah beruang terkecil..."
     val gambarUtamaPath: String,  // "hutan_hujan_tropis/fauna/beruang_madu.svg"

@@ -11,6 +11,11 @@ data class ObjekEntity(
     val idHabitat: String,
     val kategori: String,         // "fauna" | "flora"
     val namaObjek: String,
+    val namaLatin: String,
+    val namaInternasional: String,
+    val ciriCiri: String,
+    val sebaran: String,
+    val statusKonservasi: String,
     val kataKunci: String,        // Kata untuk mode susun huruf
     val faktaUnik: String,
     val gambarUtamaPath: String,  // Relatif dari assets/

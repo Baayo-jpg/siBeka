@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.ui.components.*
 import com.example.sibeka.ui.theme.*
+import com.example.sibeka.util.GambarAset
 import kotlinx.coroutines.launch
 
 data class AksesoriItem(
@@ -32,7 +33,11 @@ data class AksesoriItem(
     val nama: String,
     val harga: Int,
     val emoji: String,
-    val deskripsi: String
+    val deskripsi: String,
+    /** Gambar aksesoris di `assets/toko`, null bila belum ada. */
+    val gambar: String? = null,
+    /** Gambar maskot yang memakai aksesoris ini di `assets/maskot`. */
+    val maskot: String? = null
 )
 
 @Composable
@@ -54,16 +59,33 @@ fun TokoScreen(
 
     val daftarAksesori = listOf(
         AksesoriItem("default", "Bulu Alami", 0, "🦜", "Tampilan asli Si Beka yang ramah"),
-        AksesoriItem("topi_penjelajah", "Topi Rimba", 100, "🤠", "Siap menjelajah hutan lebat"),
-        AksesoriItem("kacamata_keren", "Kacamata Hitam", 150, "😎", "Tampil keren di bawah terik laut"),
-        AksesoriItem("mahkota_bunga", "Mahkota Bunga", 200, "🌸", "Harum semerbak dari flora rawa"),
-        AksesoriItem("helm_gunung", "Helm Gunung", 250, "🧗", "Pelindung aman di tebing tinggi")
+        AksesoriItem(
+            "topi_penjelajah", "Topi Rimba", 100, "🤠", "Siap menjelajah hutan lebat",
+            gambar = "aksesori_topi", maskot = "pakai_topi"
+        ),
+        AksesoriItem(
+            "kacamata_keren", "Kacamata Hitam", 150, "😎", "Tampil keren di bawah terik laut",
+            gambar = "aksesori_kacamata", maskot = "pakai_kacamata"
+        ),
+        AksesoriItem(
+            "mahkota_bunga", "Mahkota Bunga", 200, "🌸", "Harum semerbak dari flora rawa",
+            gambar = "aksesori_mahkota", maskot = "pakai_mahkota"
+        ),
+        AksesoriItem(
+            "helm_gunung", "Helm Gunung", 250, "🧗", "Pelindung aman di tebing tinggi",
+            gambar = "aksesori_helm", maskot = "pakai_helm"
+        )
     )
     val itemAktif = daftarAksesori.find { it.id == aksesoriAktif } ?: daftarAksesori.first()
 
     Scaffold(
         containerColor = LatarKrem,
-        topBar = { HeaderJelajahAlam { ChipBintang(totalBintang); ChipKoin(totalKoin) } },
+        topBar = {
+            HeaderJelajahAlam(
+                judul = "Toko Si Beka",
+                subjudul = "Perlengkapan seru untuk petualanganmu."
+            ) { ChipBintang(totalBintang); ChipKoin(totalKoin) }
+        },
         bottomBar = {
             SiBekaBottomBar(
                 terpilih = TabUtama.TOKO,
@@ -80,12 +102,6 @@ fun TokoScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Toko Si Beka", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                    Text("Perlengkapan seru untuk petualanganmu.", fontSize = 13.sp, color = AbuTua)
-                }
-            }
 
             // Pratinjau maskot
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -95,11 +111,16 @@ fun TokoScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        Box(contentAlignment = Alignment.TopCenter) {
+                        if (itemAktif.maskot != null) {
+                            GambarAset(
+                                nama = itemAktif.maskot,
+                                cadangan = itemAktif.emoji,
+                                modifier = Modifier.size(width = 116.dp, height = 142.dp),
+                                ukuranCadangan = 54.sp,
+                                folder = "maskot"
+                            )
+                        } else {
                             MaskotSiBeka(size = 110.dp, melompat = true)
-                            if (itemAktif.id != "default") {
-                                Text(itemAktif.emoji, fontSize = 34.sp, modifier = Modifier.offset(y = (-8).dp))
-                            }
                         }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text("Gayaku hari ini!", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
@@ -135,9 +156,21 @@ fun TokoScreen(
                 ) {
                     Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Box(
-                            Modifier.fillMaxWidth().height(78.dp).clip(RoundedCornerShape(12.dp)).background(HijauBenarMuda.copy(alpha = 0.6f)),
+                            Modifier.fillMaxWidth().height(88.dp).clip(RoundedCornerShape(12.dp)).background(HijauBenarMuda.copy(alpha = 0.6f)),
                             contentAlignment = Alignment.Center
-                        ) { Text(item.emoji, fontSize = 38.sp) }
+                        ) {
+                            if (item.gambar != null) {
+                                GambarAset(
+                                    nama = item.gambar,
+                                    cadangan = item.emoji,
+                                    modifier = Modifier.fillMaxSize().padding(8.dp),
+                                    ukuranCadangan = 36.sp,
+                                    folder = "toko"
+                                )
+                            } else {
+                                Text(item.emoji, fontSize = 38.sp)
+                            }
+                        }
 
                         Text(item.nama, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua, maxLines = 1)
 

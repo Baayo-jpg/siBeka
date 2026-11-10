@@ -45,8 +45,9 @@ fun GambarAset(
     cadangan: String,
     modifier: Modifier = Modifier,
     ukuranCadangan: TextUnit = 26.sp,
-    contentScale: ContentScale = ContentScale.Fit
-) = GambarAset(listOf(nama), cadangan, modifier, ukuranCadangan, contentScale)
+    contentScale: ContentScale = ContentScale.Fit,
+    folder: String = "ikon"
+) = GambarAset(listOf(nama), cadangan, modifier, ukuranCadangan, contentScale, folder)
 
 /**
  * Versi berlapis: memakai nama pertama yang filenya tersedia.
@@ -58,9 +59,10 @@ fun GambarAset(
     cadangan: String,
     modifier: Modifier = Modifier,
     ukuranCadangan: TextUnit = 26.sp,
-    contentScale: ContentScale = ContentScale.Fit
+    contentScale: ContentScale = ContentScale.Fit,
+    folder: String = "ikon"
 ) {
-    val path = remember(nama) { nama.firstNotNullOfOrNull { cariAsetPermainan(it) } }
+    val path = remember(nama, folder) { nama.firstNotNullOfOrNull { cariAsetPermainan(it, folder) } }
     var gagal by remember(path) { mutableStateOf(false) }
 
     Box(modifier, contentAlignment = Alignment.Center) {

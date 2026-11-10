@@ -24,7 +24,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
 
     companion object {
         const val DATABASE_NAME = "sibeka_offline.db"
-        const val DATABASE_VERSION = 5
+        const val DATABASE_VERSION = 7
         private const val TAG = "SiBekaDatabase"
 
         @Volatile
@@ -57,6 +57,11 @@ class SiBekaDatabaseHelper(private val context: Context) :
                 idHabitat TEXT NOT NULL,
                 kategori TEXT NOT NULL,
                 namaObjek TEXT NOT NULL,
+                namaLatin TEXT NOT NULL,
+                namaInternasional TEXT NOT NULL,
+                ciriCiri TEXT NOT NULL,
+                sebaran TEXT NOT NULL,
+                statusKonservasi TEXT NOT NULL,
                 kataKunci TEXT NOT NULL,
                 faktaUnik TEXT NOT NULL,
                 gambarUtamaPath TEXT NOT NULL,
@@ -91,6 +96,12 @@ class SiBekaDatabaseHelper(private val context: Context) :
         }
         if (oldVersion < 5) {
             migrateToVersionFive(db)
+        }
+        if (oldVersion < 6) {
+            migrateToVersionSix(db)
+        }
+        if (oldVersion < 7) {
+            migrateToVersionSeven(db)
         }
     }
 
@@ -144,6 +155,11 @@ class SiBekaDatabaseHelper(private val context: Context) :
                                     put("idHabitat", o.idHabitat)
                                     put("kategori", o.kategori)
                                     put("namaObjek", o.namaObjek)
+                                    put("namaLatin", o.namaLatin)
+                                    put("namaInternasional", o.namaInternasional)
+                                    put("ciriCiri", o.ciriCiri)
+                                    put("sebaran", o.sebaran)
+                                    put("statusKonservasi", o.statusKonservasi)
                                     put("kataKunci", o.kataKunci)
                                     put("faktaUnik", o.faktaUnik)
                                     put("gambarUtamaPath", o.gambarUtamaPath)
@@ -248,6 +264,67 @@ class SiBekaDatabaseHelper(private val context: Context) :
         }
     }
 
+    private fun migrateToVersionSix(db: SQLiteDatabase) {
+        val seed = context.assets.open("data/seed_data.json").use { stream ->
+            InputStreamReader(stream).use { reader ->
+                Gson().fromJson(reader, SeedDataWrapper::class.java)
+            }
+        } ?: throw IllegalStateException("Data seed tidak boleh kosong.")
+
+        db.beginTransaction()
+        try {
+            db.execSQL("ALTER TABLE objek_flora_fauna ADD COLUMN namaLatin TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE objek_flora_fauna ADD COLUMN namaInternasional TEXT NOT NULL DEFAULT ''")
+            for (objek in seed.objek) {
+                val values = ContentValues().apply {
+                    put("namaObjek", objek.namaObjek)
+                    put("namaLatin", objek.namaLatin)
+                    put("namaInternasional", objek.namaInternasional)
+                }
+                db.update(
+                    "objek_flora_fauna",
+                    values,
+                    "idObjek = ?",
+                    arrayOf(objek.idObjek)
+                )
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    private fun migrateToVersionSeven(db: SQLiteDatabase) {
+        val seed = context.assets.open("data/seed_data.json").use { stream ->
+            InputStreamReader(stream).use { reader ->
+                Gson().fromJson(reader, SeedDataWrapper::class.java)
+            }
+        } ?: throw IllegalStateException("Data seed tidak boleh kosong.")
+
+        db.beginTransaction()
+        try {
+            db.execSQL("ALTER TABLE objek_flora_fauna ADD COLUMN ciriCiri TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE objek_flora_fauna ADD COLUMN sebaran TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE objek_flora_fauna ADD COLUMN statusKonservasi TEXT NOT NULL DEFAULT ''")
+            for (objek in seed.objek) {
+                val values = ContentValues().apply {
+                    put("ciriCiri", objek.ciriCiri)
+                    put("sebaran", objek.sebaran)
+                    put("statusKonservasi", objek.statusKonservasi)
+                }
+                db.update(
+                    "objek_flora_fauna",
+                    values,
+                    "idObjek = ?",
+                    arrayOf(objek.idObjek)
+                )
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
     // ── Operasi Habitat ──────────────────────────────────────────────────────
 
     fun getAllHabitatsSync(): List<HabitatEntity> {
@@ -288,7 +365,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val list = mutableListOf<ObjekEntity>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
+            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
             arrayOf(habitatId, count.toString())
         )
         cursor.use {
@@ -302,7 +379,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getAllObjekSync(): List<ObjekEntity> {
         val list = mutableListOf<ObjekEntity>()
         val cursor = readableDatabase.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna ORDER BY idHabitat, namaObjek",
+            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna ORDER BY idHabitat, namaObjek",
             null
         )
         cursor.use {
@@ -319,9 +396,9 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val placeholders = excludeIds.joinToString(",") { "?" }
         val args = (listOf(habitatId) + excludeIds + listOf(count.toString())).toTypedArray()
         val query = if (excludeIds.isEmpty()) {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
+            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
         } else {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
+            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
         }
         val cursor = db.rawQuery(query, args)
         cursor.use {
@@ -335,7 +412,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getObjekById(id: String): ObjekEntity? {
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idObjek = ?",
+            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idObjek = ?",
             arrayOf(id)
         )
         return cursor.use {
@@ -349,10 +426,15 @@ class SiBekaDatabaseHelper(private val context: Context) :
             idHabitat = cursor.getString(1),
             kategori = cursor.getString(2),
             namaObjek = cursor.getString(3),
-            kataKunci = cursor.getString(4),
-            faktaUnik = cursor.getString(5),
-            gambarUtamaPath = cursor.getString(6),
-            gambarPasanganPath = cursor.getString(7)
+            namaLatin = cursor.getString(4),
+            namaInternasional = cursor.getString(5),
+            ciriCiri = cursor.getString(6),
+            sebaran = cursor.getString(7),
+            statusKonservasi = cursor.getString(8),
+            kataKunci = cursor.getString(9),
+            faktaUnik = cursor.getString(10),
+            gambarUtamaPath = cursor.getString(11),
+            gambarPasanganPath = cursor.getString(12)
         )
     }
 

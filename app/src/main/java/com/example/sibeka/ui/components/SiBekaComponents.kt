@@ -114,20 +114,73 @@ fun ChipBintang(jumlah: Int, modifier: Modifier = Modifier) = ChipPil(modifier) 
     Text("$jumlah", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
 }
 
+/** Bintang dan koin dalam satu pil ringkas, dipakai header yang ingin tampil minimalis. */
+@Composable
+fun ChipStatistik(bintang: Int, koin: Int, modifier: Modifier = Modifier) {
+    Surface(
+        modifier, shape = RoundedCornerShape(50), color = PutihBersih,
+        border = BorderStroke(1.dp, GarisKartu)
+    ) {
+        Row(
+            Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            Icon(Icons.Default.Star, null, tint = KuningBintang, modifier = Modifier.size(14.dp))
+            Text("$bintang", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
+            Box(Modifier.padding(horizontal = 2.dp).width(1.dp).height(11.dp).background(GarisKartu))
+            Box(
+                Modifier.size(15.dp).clip(CircleShape).background(KuningBintang),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("J", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = CoklatTua)
+            }
+            Text("$koin", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
+        }
+    }
+}
+
 // ── Header ──────────────────────────────────────────────────────────────────
 @Composable
-fun HeaderJelajahAlam(modifier: Modifier = Modifier, trailing: @Composable RowScope.() -> Unit = {}) {
-    Row(
+/**
+ * Header layar: judul di kiri, chip bintang/koin di kanan, subjudul di bawahnya.
+ *
+ * Tanpa [judul] yang dipakai adalah label "JELAJAH ALAM". Di layar yang punya
+ * judul sendiri (Koleksi, Toko), isi [judul] dan [subjudul] supaya judul layar
+ * menempati posisi header ini, bukan tampil lagi di dalam konten.
+ */
+fun HeaderJelajahAlam(
+    modifier: Modifier = Modifier,
+    judul: String? = null,
+    subjudul: String? = null,
+    trailing: @Composable RowScope.() -> Unit = {}
+) {
+    Column(
         modifier.fillMaxWidth().background(LatarKrem).statusBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Icon(Icons.Outlined.Explore, null, tint = HijauTua, modifier = Modifier.size(20.dp))
-            Text("JELAJAH ALAM", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua, letterSpacing = 0.5.sp)
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (judul != null) {
+                Text(
+                    judul, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua,
+                    maxLines = 1, modifier = Modifier.weight(1f)
+                )
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(Icons.Outlined.Explore, null, tint = HijauTua, modifier = Modifier.size(20.dp))
+                    Text("JELAJAH ALAM", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua, letterSpacing = 0.5.sp)
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), content = trailing)
         }
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), content = trailing)
+        if (judul != null && subjudul != null) {
+            Text(subjudul, fontSize = 12.sp, color = AbuTua)
+        }
     }
 }
 
@@ -198,30 +251,43 @@ fun BubbleSiBeka(teks: String, modifier: Modifier = Modifier, latar: Color = Mas
 // ── Bottom navigation (Peta · Buku Koleksi · Toko) ──────────────────────────
 @Composable
 fun SiBekaBottomBar(terpilih: TabUtama, onPeta: () -> Unit, onKoleksi: () -> Unit, onToko: () -> Unit) {
-    Column(Modifier.fillMaxWidth().background(LatarKrem)) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(GarisKartu))
+    Column(Modifier.fillMaxWidth().background(PutihBersih)) {
+        Box(Modifier.fillMaxWidth().height(0.5.dp).background(GarisKartu))
         Row(
-            Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Modifier.fillMaxWidth().navigationBarsPadding().height(52.dp).padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             ItemTab(Icons.Outlined.Map, "Peta", terpilih == TabUtama.PETA, onPeta)
-            ItemTab(Icons.Outlined.MenuBook, "Buku Koleksi", terpilih == TabUtama.KOLEKSI, onKoleksi)
+            ItemTab(Icons.Outlined.MenuBook, "Koleksi", terpilih == TabUtama.KOLEKSI, onKoleksi)
             ItemTab(Icons.Outlined.ShoppingBag, "Toko", terpilih == TabUtama.TOKO, onToko)
         }
     }
 }
 
+/**
+ * Tab ringkas: hanya ikon dan label kecil. Tab aktif dibedakan lewat warna dan
+ * ketebalan huruf, plus garis tipis di bawah label — tanpa kotak latar supaya
+ * bar tetap ringan.
+ */
 @Composable
 private fun RowScope.ItemTab(icon: ImageVector, label: String, terpilih: Boolean, onClick: () -> Unit) {
     val warna = if (terpilih) HijauTua else AbuTua
     Column(
-        Modifier.weight(1f).clip(RoundedCornerShape(16.dp))
-            .background(if (terpilih) HijauBenarMuda else Color.Transparent)
-            .clickable(onClick = onClick).padding(vertical = 8.dp),
+        Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick)
+            .padding(vertical = 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        Icon(icon, label, tint = warna, modifier = Modifier.size(22.dp))
-        Text(label, fontSize = 11.sp, fontWeight = if (terpilih) FontWeight.ExtraBold else FontWeight.SemiBold, color = warna)
+        Icon(icon, label, tint = warna, modifier = Modifier.size(21.dp))
+        Text(
+            label, fontSize = 10.sp, lineHeight = 12.sp, maxLines = 1,
+            fontWeight = if (terpilih) FontWeight.ExtraBold else FontWeight.Medium,
+            color = warna
+        )
+        Box(
+            Modifier.padding(top = 1.dp).width(14.dp).height(2.dp)
+                .clip(RoundedCornerShape(1.dp))
+                .background(if (terpilih) HijauTua else Color.Transparent)
+        )
     }
 }

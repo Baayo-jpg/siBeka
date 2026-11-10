@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Icon
@@ -31,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,7 +94,10 @@ fun KoleksiScreen(
     Scaffold(
         containerColor = LatarKrem,
         topBar = {
-            HeaderJelajahAlam { ChipBintang(totalBintang); ChipKoin(totalKoin) }
+            HeaderJelajahAlam(
+                judul = "Buku Koleksiku",
+                subjudul = "Setiap penemuan punya cerita."
+            ) { ChipBintang(totalBintang); ChipKoin(totalKoin) }
         },
         bottomBar = {
             SiBekaBottomBar(
@@ -112,12 +115,6 @@ fun KoleksiScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Buku Koleksiku", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                    Text("Setiap penemuan punya cerita.", fontSize = 13.sp, color = AbuTua)
-                }
-            }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 KartuSiBeka(Modifier.fillMaxWidth(), container = HijauBenarMuda, borderColor = HijauBenarMuda, shape = RoundedCornerShape(18.dp)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -208,6 +205,21 @@ fun KoleksiGridItem(objek: ObjekEntity, namaHabitat: String, terbuka: Boolean, o
                     if (terbuka) namaHabitat else "Menangkan kuis untuk membuka",
                     fontSize = 10.sp, color = AbuTua, maxLines = 1
                 )
+                if (terbuka) {
+                    Text(
+                        objek.namaLatin,
+                        fontSize = 10.sp,
+                        fontStyle = FontStyle.Italic,
+                        color = AbuTua,
+                        maxLines = 2
+                    )
+                    Text(
+                        objek.namaInternasional,
+                        fontSize = 10.sp,
+                        color = AbuTua,
+                        maxLines = 2
+                    )
+                }
             }
         }
     }
@@ -272,6 +284,17 @@ private fun DetailKoleksi(
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(objek.namaObjek, fontSize = 30.sp, lineHeight = 36.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                Text(
+                    "Nama Latin: ${objek.namaLatin}",
+                    fontSize = 14.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = AbuTua
+                )
+                Text(
+                    "Nama internasional (Inggris): ${objek.namaInternasional}",
+                    fontSize = 14.sp,
+                    color = AbuTua
+                )
                 if (namaHabitat.isNotBlank()) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Icon(Icons.Outlined.Place, null, tint = BiruLaut, modifier = Modifier.size(15.dp))
@@ -280,18 +303,37 @@ private fun DetailKoleksi(
                 }
             }
 
-            KartuSiBeka(Modifier.fillMaxWidth(), container = KuningMuda, borderColor = KuningMuda, shape = RoundedCornerShape(18.dp)) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(Icons.Outlined.Lightbulb, null, tint = CoklatTua, modifier = Modifier.size(18.dp))
-                        Text("Tahukah kamu?", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                    }
-                    Text(objek.faktaUnik, fontSize = 13.sp, lineHeight = 19.sp, color = HitamLembut)
-                }
-            }
+            InfoSpesies(
+                judul = "Tentang spesies ini",
+                isi = objek.faktaUnik,
+                container = KuningMuda
+            )
+            InfoSpesies(judul = "Ciri-ciri", isi = objek.ciriCiri)
+            InfoSpesies(judul = "Asal dan persebaran", isi = objek.sebaran)
+            InfoSpesies(
+                judul = "Status konservasi",
+                isi = objek.statusKonservasi +
+                    "\n\nKategori IUCN adalah penilaian global; kondisi populasi di wilayah setempat dapat berbeda. Data yang belum terverifikasi tidak disimpulkan dari nama umum."
+            )
 
             BubbleSiBeka("${objek.namaObjek} sudah jadi teman barumu. Yuk, kumpulkan teman lainnya!")
             Spacer(Modifier.height(4.dp))
+        }
+    }
+
+}
+
+@Composable
+private fun InfoSpesies(judul: String, isi: String, container: androidx.compose.ui.graphics.Color = PutihBersih) {
+    KartuSiBeka(
+        Modifier.fillMaxWidth(),
+        container = container,
+        borderColor = if (container == KuningMuda) KuningMuda else GarisKartu,
+        shape = RoundedCornerShape(18.dp)
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(judul, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+            Text(isi, fontSize = 13.sp, lineHeight = 19.sp, color = HitamLembut)
         }
     }
 }
