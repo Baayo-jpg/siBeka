@@ -1,4 +1,4 @@
-# Aset Gambar siBeka (halaman Peta)
+# Aset Gambar siBeka
 
 Semua gambar Peta dimuat dari `app/src/main/assets/`. Tidak ada aset yang
 di-hardcode di kode: komponen mencari file berdasarkan nama, dan bila tidak ada
@@ -10,7 +10,9 @@ pernah gagal hanya karena gambar belum tersedia.
 ```
 app/src/main/assets/
 ├── ikon/     maskot, lencana simpul (ikon level & ikon last)
-└── latar/    background tiap habitat
+├── latar/    background tiap habitat
+├── toko/     gambar barang aksesori Toko
+└── maskot/   maskot layar pembuka (badan + tangan) dan maskot memakai aksesori
 ```
 
 Ekstensi yang dicari berurutan: **webp → png → svg**. Untuk nama yang sama, file
@@ -71,7 +73,50 @@ Perilaku tampilan:
   simpul tetap terbaca;
 - ± 100 dp teratas tertutup banner habitat yang menempel saat digulir.
 
-## 3. Asal dan pemrosesan aset
+## 3. `assets/toko/` dan `assets/maskot/` — aksesori Toko
+
+Empat aksesori, masing-masing punya gambar barang dan gambar maskot yang
+memakainya:
+
+| Aksesori (id) | Gambar barang | Maskot memakai | Ukuran |
+|---|---|---|---|
+| Topi Rimba (`topi_penjelajah`) | `toko/aksesori_topi.webp` | `maskot/pakai_topi.webp` | 358 × 320 / 481 × 640 |
+| Kacamata Hitam (`kacamata_keren`) | `toko/aksesori_kacamata.webp` | `maskot/pakai_kacamata.webp` | 447 × 227 / 454 × 640 |
+| Mahkota Bunga (`mahkota_bunga`) | `toko/aksesori_mahkota.webp` | `maskot/pakai_mahkota.webp` | 421 × 239 / 534 × 640 |
+| Helm Gunung (`helm_gunung`) | `toko/aksesori_helm.webp` | `maskot/pakai_helm.webp` | 296 × 320 / 487 × 640 |
+
+Asal: 8 file SVG (hasil trace) plus PNG 733–1097 px di
+`C:\Users\HP\Downloads\maskot\`. Latar putihnya dibuang dengan isian banjir dari
+keempat sudut, tepi dikikis 1 px lalu dilembutkan 0,7 px agar tidak ada garis
+putih, lalu dipotong ke isi dan disimpan sebagai WebP kualitas 90 dengan alpha
+(total ± 237 KB).
+
+`maskot/pakai_topi.webp` masih memuat rumput hijau di bawah kaki karena bagian
+dari ilustrasi aslinya.
+
+Dipakai oleh `ui/toko/TokoScreen.kt`: gambar barang tampil di kartu aksesori,
+gambar maskot tampil di kartu "Gayaku hari ini!" sesuai aksesori yang dipakai.
+Item `default` memakai `MaskotSiBeka` seperti sebelumnya.
+
+## 4. Busur SVG yang dibersihkan
+
+SVG flora/fauna/pasangan berasal dari hasil trace (VTracer). Trace itu sering
+mengganti potongan yang nyaris lurus dengan **busur beradius raksasa** — ada yang
+sampai 361 juta, padahal kanvasnya hanya 500 px. Pustaka SVG di Android
+(androidsvg, dipakai `coil-svg`) menghitung titik pusat busur seperti itu lalu
+melempar `ArrayIndexOutOfBoundsException`, sehingga gambarnya gagal dimuat dan
+kartu menampilkan ikon pengganti. Kasus yang terlihat: `Babi Hutan`.
+
+Perbaikannya: setiap busur dengan radius > 10.000 diganti perintah garis ke titik
+akhir yang sama (`A/a` → `L/l`). Karena radiusnya jauh lebih besar daripada jarak
+titiknya, lengkungan yang hilang maksimal 0,005 px — tidak terlihat. Hasilnya:
+**2.831 busur di 137 berkas**, dan render sebelum/sesudah dibandingkan per piksel
+(selisih maksimum 1 dari 255 di satu berkas, sisanya 0).
+
+Kalau nanti menambah SVG hasil trace baru, jalankan pemeriksaan yang sama:
+busur dengan radius ribuan kali ukuran kanvas adalah tanda perlu dibersihkan.
+
+## 5. Asal dan pemrosesan aset
 
 File asli dari Canva berupa SVG yang isinya sebenarnya **gambar raster base64**
 (PNG 704 × 1520 untuk latar, PNG 246 × 204 untuk lencana), ditambah metadata C2PA
@@ -85,7 +130,7 @@ sebagai WebP:
 Hasilnya total ± 165 KB, dari 5,4 MB berkas SVG asli. File SVG aslinya tetap ada
 di `C:\Users\HP\Downloads\ikon\` (tidak diubah).
 
-## 4. Setelah menambah atau mengganti aset
+## 6. Setelah menambah atau mengganti aset
 
 ```
 ./gradlew :app:assembleDebug --offline
