@@ -128,7 +128,7 @@ fun AboutScreen(onKembali: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        // Maskot Si Beka memakai kacamata hitam, sama seperti di Toko.
+                        // Maskot Si Beka
                         GambarAset(
                             nama = "pakai_kacamata",
                             cadangan = "😎",
@@ -154,8 +154,8 @@ fun AboutScreen(onKembali: () -> Unit) {
                 KartuSiBeka(Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp)) {
                     Text(
                         "Si Beka adalah permainan edukasi pengenalan ekosistem Indonesia. " +
-                            "Penjelajah kecil diajak menelusuri lima habitat — hutan hujan tropis, " +
-                            "laut, sungai, rawa, dan gunung — lewat tiga mode kuis. Spesies yang " +
+                            "Penjelajah kecil diajak menelusuri lima habitat, hutan hujan tropis, " +
+                            "laut, sungai, rawa, dan gunung lewat tiga mode kuis. Spesies yang " +
                             "ditemukan tersimpan di Buku Koleksi, dan koin dari bermain bisa " +
                             "ditukar aksesori di Toko.",
                         fontSize = 12.5.sp, lineHeight = 18.sp, color = HitamLembut,
@@ -241,7 +241,7 @@ private fun KartuTimPengembang() {
                 )
             } else {
                 Text(
-                    "${anggota.size} anggota · urut NIM terkecil ke terbesar",
+                    "${anggota.size} anggota",
                     fontSize = 11.sp, color = AbuTua, modifier = Modifier.padding(bottom = 4.dp)
                 )
                 anggota.forEachIndexed { index, orang ->

@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
                         composable("splash") {
                             SplashScreen(
                                 onSplashFinished = {
+                                    SiBekaApp.instance.container.bgmPlayer.play()
                                     coroutineScope.launch {
                                         val nama = dataStore.namaPemain.first()
                                         val destination = if (nama.isBlank()) "sambutan" else "peta"
@@ -159,9 +160,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        SiBekaApp.instance.container.bgmPlayer.resume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        SiBekaApp.instance.container.bgmPlayer.pause()
+    }
+
     override fun onDestroy() {
-        // onTerminate tidak pernah dipanggil di perangkat, jadi SoundPool dibebaskan di sini.
-        if (isFinishing) SiBekaApp.instance.container.sfxPlayer.release()
+        if (isFinishing) {
+            val container = SiBekaApp.instance.container
+            container.sfxPlayer.release()
+            container.bgmPlayer.release()
+        }
         super.onDestroy()
     }
 }

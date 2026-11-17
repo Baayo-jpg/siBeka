@@ -43,19 +43,24 @@ class SfxPlayer(private val context: Context) {
     }
 
     private fun loadSounds() {
-        soundClickId = loadFromAsset("audio/sfx/click.mp3")
-        soundBenarId = loadFromAsset("audio/sfx/benar.mp3")
-        soundSalahId = loadFromAsset("audio/sfx/salah.mp3")
-        soundKoinId = loadFromAsset("audio/sfx/koin.mp3")
-        soundBintangId = loadFromAsset("audio/sfx/bintang.mp3")
+        soundClickId = loadFromAsset("click")
+        soundBenarId = loadFromAsset("benar")
+        soundSalahId = loadFromAsset("salah")
+        soundKoinId = loadFromAsset("koin")
+        soundBintangId = loadFromAsset("bintang")
     }
 
-    private fun loadFromAsset(assetPath: String): Int {
-        return try {
-            context.assets.openFd(assetPath).use { afd -> soundPool.load(afd, 1) }
-        } catch (e: IOException) {
-            0 // Belum ada file, fallback ke synth tone
+    private fun loadFromAsset(namaSuara: String): Int {
+        val ekstensi = listOf(".mp3", ".ogg", ".wav")
+        for (ext in ekstensi) {
+            val path = "audio/sfx/$namaSuara$ext"
+            try {
+                return context.assets.openFd(path).use { afd -> soundPool.load(afd, 1) }
+            } catch (_: IOException) {
+                // Lanjut coba format berikutnya
+            }
         }
+        return 0 // Belum ada file, fallback ke synth tone
     }
 
     fun setMuted(muted: Boolean) {

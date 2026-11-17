@@ -116,6 +116,7 @@ class PetaViewModel(
             val baru = !_uiState.value.sfxMuted
             repository.dataStore.toggleSfx(baru)
             sfxPlayer.setMuted(baru)
+            SiBekaApp.instance.container.bgmPlayer.setMuted(baru)
         }
     }
 

@@ -24,7 +24,10 @@ class SiBekaApp : Application(), ImageLoaderFactory {
         instance = this
         container = AppContainer(this)
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-            container.sfxPlayer.setMuted(container.dataStore.sfxMuted.first())
+            container.dataStore.sfxMuted.collect { muted ->
+                container.sfxPlayer.setMuted(muted)
+                container.bgmPlayer.setMuted(muted)
+            }
         }
     }
 

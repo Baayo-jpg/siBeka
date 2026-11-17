@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.sibeka.data.db.SiBekaDatabaseHelper
 import com.example.sibeka.data.repository.DataStoreManager
 import com.example.sibeka.data.repository.SiBekaRepository
+import com.example.sibeka.util.BgmPlayer
 import com.example.sibeka.util.SfxPlayer
 
 class AppContainer(private val context: Context) {
@@ -18,6 +19,10 @@ class AppContainer(private val context: Context) {
 
     val sfxPlayer: SfxPlayer by lazy {
         SfxPlayer(context)
+    }
+
+    val bgmPlayer: BgmPlayer by lazy {
+        BgmPlayer(context)
     }
 
     val repository: SiBekaRepository by lazy {
