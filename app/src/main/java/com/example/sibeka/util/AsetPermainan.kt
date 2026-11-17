@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
@@ -46,8 +47,9 @@ fun GambarAset(
     modifier: Modifier = Modifier,
     ukuranCadangan: TextUnit = 26.sp,
     contentScale: ContentScale = ContentScale.Fit,
-    folder: String = "ikon"
-) = GambarAset(listOf(nama), cadangan, modifier, ukuranCadangan, contentScale, folder)
+    folder: String = "ikon",
+    filterQuality: FilterQuality = FilterQuality.Low
+) = GambarAset(listOf(nama), cadangan, modifier, ukuranCadangan, contentScale, folder, filterQuality)
 
 /**
  * Versi berlapis: memakai nama pertama yang filenya tersedia.
@@ -60,7 +62,8 @@ fun GambarAset(
     modifier: Modifier = Modifier,
     ukuranCadangan: TextUnit = 26.sp,
     contentScale: ContentScale = ContentScale.Fit,
-    folder: String = "ikon"
+    folder: String = "ikon",
+    filterQuality: FilterQuality = FilterQuality.Low
 ) {
     val path = remember(nama, folder) { nama.firstNotNullOfOrNull { cariAsetPermainan(it, folder) } }
     var gagal by remember(path) { mutableStateOf(false) }
@@ -71,6 +74,7 @@ fun GambarAset(
                 model = path,
                 contentDescription = null,
                 contentScale = contentScale,
+                filterQuality = filterQuality,
                 modifier = Modifier.fillMaxSize(),
                 onState = { state ->
                     if (state is AsyncImagePainter.State.Error) gagal = true

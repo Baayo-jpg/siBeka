@@ -18,75 +18,48 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sibeka.SiBekaApp
-import com.example.sibeka.data.db.ObjekEntity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sibeka.data.model.ModeKuis
+import com.example.sibeka.data.model.namaTampilHabitat
+import com.example.sibeka.data.model.urutkanHabitat
 import com.example.sibeka.ui.components.*
+import com.example.sibeka.ui.kuis.URUTAN_MODE
+import com.example.sibeka.ui.kuis.info
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.GambarAset
 import kotlinx.coroutines.launch
 
-/** Urutan tampil habitat pada jalur belajar. */
-val URUTAN_HABITAT = listOf("GN", "HH", "RW", "SG", "LT")
-
-/** Simpul mode kuis (id mode dipakai untuk navigasi). */
-private val SIMPUL_MODE = listOf(
-    ModeKuis.SUSUN_HURUF to "🔤",
-    ModeKuis.PASANGKAN to "🔗",
-    ModeKuis.POTONGAN_GAMBAR to "🍃"
-)
+/** Jarak aman sebelum banner kepala selesai diukur. */
+private val JARAK_AWAL_BANNER = 98.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PetaScreen(
     onPilihHabitat: (habitatId: String) -> Unit,
     onMulaiKuis: (habitatId: String, mode: ModeKuis) -> Unit,
-    onBukaKoleksi: () -> Unit,
+    /** `null` = koleksi semua habitat; id habitat = koleksi terfilter habitat itu. */
+    onBukaKoleksi: (habitatId: String?) -> Unit,
     onBukaToko: () -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val repository = SiBekaApp.instance.container.repository
-    val dataStore = repository.dataStore
-    val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
-
-    val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
-    val koleksi by repository.getAllKoleksi().collectAsState(initial = emptyList())
-    val namaPemain by dataStore.namaPemain.collectAsState(initial = "")
-    val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
-    val totalBintang by dataStore.totalBintang.collectAsState(initial = 0)
-    val sfxMutedPreference by dataStore.sfxMuted.collectAsState(initial = null)
-    val sfxMuted = sfxMutedPreference ?: false
-
-    var semuaObjek by remember { mutableStateOf<List<ObjekEntity>>(emptyList()) }
-    LaunchedEffect(Unit) { semuaObjek = repository.getAllObjek() }
-
-    LaunchedEffect(sfxMutedPreference) {
-        sfxMutedPreference?.let(sfxPlayer::setMuted)
-    }
-
-    val habitatTerurut = remember(habitats) {
-        habitats.sortedBy { habitat ->
-            URUTAN_HABITAT.indexOf(habitat.id).let { if (it < 0) URUTAN_HABITAT.size else it }
-        }
-    }
-    val habitatById = remember(semuaObjek) { semuaObjek.associate { it.idObjek to it.idHabitat } }
-    val jumlahByHabitat = remember(semuaObjek) { semuaObjek.groupingBy { it.idHabitat }.eachCount() }
-    val ditemukanByHabitat = remember(koleksi, habitatById) {
-        koleksi.mapNotNull { habitatById[it.idObjek] }.groupingBy { it }.eachCount()
-    }
-
-    // Habitat yang masih punya spesies belum ditemukan menjadi habitat aktif.
-    val habitatAktif = remember(habitatTerurut, jumlahByHabitat, ditemukanByHabitat) {
-        habitatTerurut.firstOrNull { habitat ->
-            val total = jumlahByHabitat[habitat.id] ?: 0
-            (ditemukanByHabitat[habitat.id] ?: 0) < total
-        }?.id ?: habitatTerurut.firstOrNull()?.id
-    }
+    val viewModel: PetaViewModel = viewModel(factory = PetaViewModel.Factory())
+    val ui by viewModel.uiState.collectAsStateWithLifecycle()
+    val habitatTerurut = ui.habitatTerurut
+    val habitatAktif = ui.habitatAktif
 
     val listState = rememberLazyListState()
+
+    // Tinggi banner kepala diukur langsung agar jarak daftar tidak bergantung angka tetap.
+    var tinggiBannerPx by remember { mutableStateOf(0) }
+    val kerapatan = LocalDensity.current
+    val paddingAtasBanner = remember(tinggiBannerPx, kerapatan) {
+        if (tinggiBannerPx > 0) with(kerapatan) { tinggiBannerPx.toDp() } + 16.dp else JARAK_AWAL_BANNER
+    }
 
     // Deteksi habitat aktif berdasarkan koordinat Y item yang sedang berada di bawah header (~20% tinggi layar).
     // Mendukung scroll turun maupun naik dengan transisi yang akurat.
@@ -123,24 +96,19 @@ fun PetaScreen(
         containerColor = LatarKrem,
         topBar = {
             SapaanAtas(
-                nama = namaPemain.ifBlank { "Penjelajah" },
-                totalBintang = totalBintang,
-                totalKoin = totalKoin,
-                sfxMuted = sfxMuted,
-                onToggleSuara = {
-                    coroutineScope.launch {
-                        dataStore.toggleSfx(!sfxMuted)
-                        sfxPlayer.setMuted(!sfxMuted)
-                    }
-                }
+                nama = ui.namaPemain.ifBlank { "Penjelajah" },
+                totalBintang = ui.totalBintang,
+                totalKoin = ui.totalKoin,
+                sfxMuted = ui.sfxMuted,
+                onToggleSuara = { viewModel.toggleSuara() }
             )
         },
         bottomBar = {
             SiBekaBottomBar(
                 terpilih = TabUtama.PETA,
                 onPeta = {},
-                onKoleksi = { sfxPlayer.playClick(); onBukaKoleksi() },
-                onToko = { sfxPlayer.playClick(); onBukaToko() }
+                onKoleksi = { viewModel.klik(); onBukaKoleksi(null) },
+                onToko = { viewModel.klik(); onBukaToko() }
             )
         }
     ) { innerPadding ->
@@ -149,7 +117,7 @@ fun PetaScreen(
                 Modifier.fillMaxSize(),
                 state = listState,
                 // Beri ruang atas untuk header tunggal yang overlay
-                contentPadding = PaddingValues(top = 98.dp, bottom = 24.dp)
+                contentPadding = PaddingValues(top = paddingAtasBanner, bottom = 24.dp)
             ) {
                 if (habitatTerurut.isEmpty()) {
                     item {
@@ -161,18 +129,18 @@ fun PetaScreen(
 
                 habitatTerurut.forEachIndexed { index, habitat ->
                     val tema = temaHabitat(habitat.id)
-                    val jumlah = jumlahByHabitat[habitat.id] ?: 0
-                    val ditemukan = ditemukanByHabitat[habitat.id] ?: 0
-                    val lengkap = jumlah > 0 && ditemukan >= jumlah
+                    val jumlah = ui.jumlah(habitat.id)
+                    val ditemukan = ui.ditemukan(habitat.id)
+                    val lengkap = ui.lengkap(habitat.id)
 
                     item(key = "jalur-${habitat.id}") {
                         val simpul = buildList {
-                            SIMPUL_MODE.forEachIndexed { urutanMode, (mode, ikon) ->
+                            URUTAN_MODE.forEachIndexed { urutanMode, mode ->
                                 add(
                                     SimpulBelajar(
                                         id = "mode:${mode.name}",
-                                        ikon = ikon,
-                                        judul = mode.name,
+                                        ikon = mode.info.inisial,
+                                        judul = mode.info.judul,
                                         selesai = lengkap,
                                         aktif = habitat.id == habitatAktif && urutanMode == 0 && !lengkap,
                                         aset = "mode_${mode.name.lowercase()}"
@@ -199,8 +167,8 @@ fun PetaScreen(
                             idHabitat = habitat.id,
                             namaHabitat = if (index > 0) namaTampilHabitat(habitat.id, habitat.namaHabitat) else null
                         ) { dipilih ->
-                            sfxPlayer.playClick()
-                            val mode = SIMPUL_MODE.firstOrNull { "mode:${it.first.name}" == dipilih.id }?.first
+                            viewModel.klik()
+                            val mode = URUTAN_MODE.firstOrNull { "mode:${it.name}" == dipilih.id }
                             if (mode != null) onMulaiKuis(habitat.id, mode) else onPilihHabitat(habitat.id)
                         }
                     }
@@ -219,6 +187,9 @@ fun PetaScreen(
 
                 AnimatedContent(
                     targetState = idx,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onSizeChanged { tinggiBannerPx = it.height },
                     transitionSpec = {
                         if (targetState > initialState) {
                             (slideInVertically { height -> height / 2 } + fadeIn()) togetherWith
@@ -232,8 +203,8 @@ fun PetaScreen(
                 ) { targetIdx ->
                     val hab = habitatTerurut[targetIdx]
                     val tm = temaHabitat(hab.id)
-                    val jml = jumlahByHabitat[hab.id] ?: 0
-                    val dtk = ditemukanByHabitat[hab.id] ?: 0
+                    val jml = ui.jumlah(hab.id)
+                    val dtk = ui.ditemukan(hab.id)
 
                     BannerHabitat(
                         nomor = targetIdx + 1,
@@ -243,10 +214,10 @@ fun PetaScreen(
                         ditemukan = dtk,
                         jumlahSpesies = jml,
                         habitatId = hab.id,
-                        onBukaPanduan = {
-                            sfxPlayer.playClick()
-                            onBukaKoleksi()
-                        }
+                                                    onBukaPanduan = {
+                                viewModel.klik()
+                                onBukaKoleksi(hab.id)
+                            }
                     )
                 }
             }

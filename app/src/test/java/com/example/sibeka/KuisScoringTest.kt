@@ -1,7 +1,11 @@
 package com.example.sibeka
 
 import com.example.sibeka.data.db.SeedDataWrapper
+import com.example.sibeka.data.model.AturanPermainan
 import com.example.sibeka.data.model.ModeKuis
+import com.example.sibeka.ui.kuis.URUTAN_MODE
+import com.example.sibeka.ui.kuis.info
+import com.example.sibeka.ui.kuis.poinSetelahBukaPotongan
 import com.example.sibeka.ui.kuis.skorJawaban
 import com.google.gson.Gson
 import java.io.File
@@ -22,6 +26,38 @@ class KuisScoringTest {
     fun otherQuizModesKeepFixedScore() {
         assertEquals(100, skorJawaban(ModeKuis.PASANGKAN, 55))
         assertEquals(100, skorJawaban(ModeKuis.SUSUN_HURUF, 20))
+    }
+
+    /** Aturan Potongan Gambar: −15 per ubin, berhenti di poin minimal. */
+    @Test
+    fun potonganPointsStepDownFifteenAndNeverBelowMinimum() {
+        assertEquals(85, poinSetelahBukaPotongan(AturanPermainan.POIN_POTONGAN_AWAL))
+
+        var poin = AturanPermainan.POIN_POTONGAN_AWAL
+        repeat(AturanPermainan.JUMLAH_UBIN_POTONGAN) { poin = poinSetelahBukaPotongan(poin) }
+        assertEquals(AturanPermainan.POIN_POTONGAN_MINIMAL, poin)
+        assertEquals(
+            AturanPermainan.POIN_POTONGAN_MINIMAL,
+            poinSetelahBukaPotongan(AturanPermainan.POIN_POTONGAN_MINIMAL)
+        )
+    }
+
+    /** Setiap mode wajib punya metadata lengkap dan muncul sekali di urutan tampil. */
+    @Test
+    fun everyModeHasCompleteInfoAndAppearsOnceInOrder() {
+        val terdaftar = mutableSetOf<ModeKuis>()
+        URUTAN_MODE.forEach { mode ->
+            assertTrue("Mode ${mode.name} muncul dua kali", terdaftar.add(mode))
+            val info = mode.info
+            assertTrue(info.judul.isNotBlank())
+            assertTrue(info.deskripsi.isNotBlank())
+            assertTrue(info.inisial.isNotBlank())
+            assertTrue(info.judulKuis.isNotBlank())
+            assertTrue(info.instruksi.isNotBlank())
+            assertTrue(info.hintBubble.isNotBlank())
+            assertTrue(info.hintTombol.isNotBlank())
+        }
+        assertEquals(ModeKuis.entries.size, URUTAN_MODE.size)
     }
 
     @Test

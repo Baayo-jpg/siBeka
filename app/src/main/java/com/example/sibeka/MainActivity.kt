@@ -16,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.sibeka.data.model.ModeKuis
+import com.example.sibeka.ui.about.AboutScreen
+import com.example.sibeka.ui.koleksi.FILTER_SEMUA_HABITAT
 import com.example.sibeka.ui.koleksi.KoleksiScreen
 import com.example.sibeka.ui.kuis.KuisScreen
 import com.example.sibeka.ui.level.LevelSelectScreen
@@ -78,7 +80,7 @@ class MainActivity : ComponentActivity() {
                                 onMulaiKuis = { habitatId, mode ->
                                     navController.navigate("kuis/$habitatId/${mode.name}")
                                 },
-                                onBukaKoleksi = { navController.keTab("koleksi") },
+                                onBukaKoleksi = { habitatId -> navController.keTab(ruteKoleksi(habitatId)) },
                                 onBukaToko = { navController.keTab("toko") }
                             )
                         }
@@ -113,12 +115,28 @@ class MainActivity : ComponentActivity() {
                             KuisScreen(
                                 habitatId = habitatId,
                                 modeKuis = modeKuis,
-                                onKeluarKuis = { navController.popBackStack() }
+                                onKeluarKuis = { navController.popBackStack() },
+                                onPilihModeLain = {
+                                    navController.navigate("level/$habitatId") {
+                                        popUpTo("peta") { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                }
                             )
                         }
 
-                        composable("koleksi") {
+                        composable(
+                            route = "koleksi?habitatId={habitatId}",
+                            arguments = listOf(
+                                navArgument("habitatId") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val filterHabitat = backStackEntry.arguments?.getString("habitatId").orEmpty()
                             KoleksiScreen(
+                                filterAwal = filterHabitat.ifBlank { FILTER_SEMUA_HABITAT },
                                 onBukaPeta = { navController.keTab("peta") },
                                 onBukaToko = { navController.keTab("toko") }
                             )
@@ -127,15 +145,30 @@ class MainActivity : ComponentActivity() {
                         composable("toko") {
                             TokoScreen(
                                 onBukaPeta = { navController.keTab("peta") },
-                                onBukaKoleksi = { navController.keTab("koleksi") }
+                                onBukaKoleksi = { navController.keTab("koleksi") },
+                                onBukaTentang = { navController.navigate("about") }
                             )
+                        }
+
+                        composable("about") {
+                            AboutScreen(onKembali = { navController.popBackStack() })
                         }
                     }
                 }
             }
         }
     }
+
+    override fun onDestroy() {
+        // onTerminate tidak pernah dipanggil di perangkat, jadi SoundPool dibebaskan di sini.
+        if (isFinishing) SiBekaApp.instance.container.sfxPlayer.release()
+        super.onDestroy()
+    }
 }
+
+/** Rute koleksi, terfilter ke satu habitat bila id diberikan. */
+private fun ruteKoleksi(habitatId: String?): String =
+    if (habitatId.isNullOrBlank()) "koleksi" else "koleksi?habitatId=$habitatId"
 
 /** Pindah antar tab bawah (Peta / Koleksi / Toko) tanpa menumpuk back stack. */
 private fun NavController.keTab(route: String) {

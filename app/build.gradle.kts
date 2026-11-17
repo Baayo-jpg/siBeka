@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.sibeka"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.sibeka"
@@ -81,6 +81,9 @@ dependencies {
 
     // DataStore — simpan progres & preferensi ringan (nama pemain, mute state)
     implementation(libs.datastore.preferences)
+
+    // Rive — memutar animasi maskot yang diekspor dari rive/splash
+    implementation(libs.rive.android)
 
     // Gson — parse seed_data.json saat pre-populate database
     implementation(libs.gson)

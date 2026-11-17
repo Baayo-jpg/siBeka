@@ -42,7 +42,7 @@ fun warnaGarisOpsi(s: StatusOpsi): Color = when (s) {
 
 @Composable
 fun KuisTopBar(
-    namaHabitat: String,
+    label: String,
     totalKoin: Int,
     onCloseClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -54,7 +54,7 @@ fun KuisTopBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TombolIkonBulat(Icons.Default.Close, "Tutup kuis", onCloseClick)
-        Text(namaHabitat.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = AbuTua, letterSpacing = 0.6.sp)
+        Text(label, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = AbuTua, letterSpacing = 0.6.sp)
         ChipKoin(totalKoin)
     }
 }

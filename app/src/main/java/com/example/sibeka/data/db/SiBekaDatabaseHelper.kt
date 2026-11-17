@@ -24,8 +24,12 @@ class SiBekaDatabaseHelper(private val context: Context) :
 
     companion object {
         const val DATABASE_NAME = "sibeka_offline.db"
-        const val DATABASE_VERSION = 7
+        const val DATABASE_VERSION = 8
         private const val TAG = "SiBekaDatabase"
+
+        /** Daftar kolom objek dipakai semua query supaya penambahan kolom cukup di sini. */
+        private const val KOLOM_OBJEK = "idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, " +
+            "ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath"
 
         @Volatile
         private var INSTANCE: SiBekaDatabaseHelper? = null
@@ -103,14 +107,23 @@ class SiBekaDatabaseHelper(private val context: Context) :
         if (oldVersion < 7) {
             migrateToVersionSeven(db)
         }
+        if (oldVersion < 8) {
+            // Aset spesies dipindah dari SVG ke WebP: samakan path di database lama.
+            updateImagePathsFromSeedData(db)
+        }
     }
 
-    private fun updateImagePathsFromSeedData(db: SQLiteDatabase) {
-        val seed = context.assets.open("data/seed_data.json").use { stream ->
+    /** Membaca seed dari assets lewat satu jalur agar migrasi tidak menduplikasi kode. */
+    private fun muatSeed(): SeedDataWrapper {
+        return context.assets.open("data/seed_data.json").use { stream ->
             InputStreamReader(stream).use { reader ->
                 Gson().fromJson(reader, SeedDataWrapper::class.java)
             }
         } ?: throw IllegalStateException("Data seed tidak boleh kosong.")
+    }
+
+    private fun updateImagePathsFromSeedData(db: SQLiteDatabase) {
+        val seed = muatSeed()
 
         db.beginTransaction()
         try {
@@ -265,11 +278,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     }
 
     private fun migrateToVersionSix(db: SQLiteDatabase) {
-        val seed = context.assets.open("data/seed_data.json").use { stream ->
-            InputStreamReader(stream).use { reader ->
-                Gson().fromJson(reader, SeedDataWrapper::class.java)
-            }
-        } ?: throw IllegalStateException("Data seed tidak boleh kosong.")
+        val seed = muatSeed()
 
         db.beginTransaction()
         try {
@@ -295,11 +304,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     }
 
     private fun migrateToVersionSeven(db: SQLiteDatabase) {
-        val seed = context.assets.open("data/seed_data.json").use { stream ->
-            InputStreamReader(stream).use { reader ->
-                Gson().fromJson(reader, SeedDataWrapper::class.java)
-            }
-        } ?: throw IllegalStateException("Data seed tidak boleh kosong.")
+        val seed = muatSeed()
 
         db.beginTransaction()
         try {
@@ -365,7 +370,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val list = mutableListOf<ObjekEntity>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
+            "SELECT $KOLOM_OBJEK FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?",
             arrayOf(habitatId, count.toString())
         )
         cursor.use {
@@ -379,7 +384,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getAllObjekSync(): List<ObjekEntity> {
         val list = mutableListOf<ObjekEntity>()
         val cursor = readableDatabase.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna ORDER BY idHabitat, namaObjek",
+            "SELECT $KOLOM_OBJEK FROM objek_flora_fauna ORDER BY idHabitat, namaObjek",
             null
         )
         cursor.use {
@@ -396,9 +401,9 @@ class SiBekaDatabaseHelper(private val context: Context) :
         val placeholders = excludeIds.joinToString(",") { "?" }
         val args = (listOf(habitatId) + excludeIds + listOf(count.toString())).toTypedArray()
         val query = if (excludeIds.isEmpty()) {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
+            "SELECT $KOLOM_OBJEK FROM objek_flora_fauna WHERE idHabitat = ? ORDER BY RANDOM() LIMIT ?"
         } else {
-            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
+            "SELECT $KOLOM_OBJEK FROM objek_flora_fauna WHERE idHabitat = ? AND idObjek NOT IN ($placeholders) ORDER BY RANDOM() LIMIT ?"
         }
         val cursor = db.rawQuery(query, args)
         cursor.use {
@@ -412,7 +417,7 @@ class SiBekaDatabaseHelper(private val context: Context) :
     fun getObjekById(id: String): ObjekEntity? {
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT idObjek, idHabitat, kategori, namaObjek, namaLatin, namaInternasional, ciriCiri, sebaran, statusKonservasi, kataKunci, faktaUnik, gambarUtamaPath, gambarPasanganPath FROM objek_flora_fauna WHERE idObjek = ?",
+            "SELECT $KOLOM_OBJEK FROM objek_flora_fauna WHERE idObjek = ?",
             arrayOf(id)
         )
         return cursor.use {

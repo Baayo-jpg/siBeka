@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.sibeka.SiBekaApp
 import com.example.sibeka.data.db.ObjekEntity
+import com.example.sibeka.data.model.AturanPermainan
 import com.example.sibeka.data.model.ModeKuis
 import com.example.sibeka.data.model.StatusJawaban
+import com.example.sibeka.data.repository.DataStoreManager
 import com.example.sibeka.data.repository.SiBekaRepository
 import com.example.sibeka.util.SfxPlayer
 import kotlinx.coroutines.flow.*
@@ -15,6 +17,11 @@ import kotlinx.coroutines.launch
 
 internal fun skorJawaban(mode: ModeKuis, poinPotonganTersisa: Int): Int =
     if (mode == ModeKuis.POTONGAN_GAMBAR) poinPotonganTersisa else 100
+
+/** Poin Potongan Gambar setelah satu ubin dibuka; tidak pernah di bawah batas minimal. */
+internal fun poinSetelahBukaPotongan(poinSekarang: Int): Int =
+    (poinSekarang - AturanPermainan.PENGURANGAN_POIN_PER_UBIN)
+        .coerceAtLeast(AturanPermainan.POIN_POTONGAN_MINIMAL)
 
 data class KuisUiState(
     val isLoading: Boolean = true,
@@ -27,6 +34,8 @@ data class KuisUiState(
     val totalBintang: Int = 0,
     val jawabanBenar: Int = 0,
     val skorSesi: Int = 0,
+    /** Koin yang benar-benar bertambah di sesi ini (hanya dari spesies baru). */
+    val koinDidapat: Int = 0,
     val isKuisSelesai: Boolean = false,
     // State khusus Mode Susun Huruf
     val hurufTersedia: List<Char> = emptyList(),
@@ -35,8 +44,8 @@ data class KuisUiState(
     val opsiJawaban: List<ObjekEntity> = emptyList(),
     val opsiTerpilihId: String? = null,
     // State khusus Potongan Gambar (6 potongan: true = terbuka, false = tertutup)
-    val potonganTerbuka: List<Boolean> = List(6) { false },
-    val poinPotonganTersisa: Int = 100
+    val potonganTerbuka: List<Boolean> = List(AturanPermainan.JUMLAH_UBIN_POTONGAN) { false },
+    val poinPotonganTersisa: Int = AturanPermainan.POIN_POTONGAN_AWAL
 )
 
 class KuisViewModel(
@@ -50,7 +59,7 @@ class KuisViewModel(
     val uiState: StateFlow<KuisUiState> = _uiState.asStateFlow()
 
     val totalKoin: StateFlow<Int> = repository.dataStore.totalKoin
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 100)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AturanPermainan.KOIN_AWAL)
 
     val currentSoal: ObjekEntity?
         get() = _uiState.value.daftarSoal.getOrNull(_uiState.value.currentSoalIndex)
@@ -71,7 +80,7 @@ class KuisViewModel(
             val habitat = repository.getHabitatById(habitatId)
             val namaHab = habitat?.namaHabitat ?: "Habitat"
 
-            val soalList = repository.getSoalByHabitat(habitatId, count = 5)
+            val soalList = repository.getSoalByHabitat(habitatId, count = AturanPermainan.JUMLAH_SOAL_PER_SESI)
             if (soalList.isNotEmpty()) {
                 _uiState.update {
                     it.copy(
@@ -83,6 +92,7 @@ class KuisViewModel(
                         totalBintang = 0,
                         jawabanBenar = 0,
                         skorSesi = 0,
+                        koinDidapat = 0,
                         isKuisSelesai = false
                     )
                 }
@@ -135,7 +145,7 @@ class KuisViewModel(
                     it.copy(
                         opsiJawaban = allOptions,
                         opsiTerpilihId = null,
-                        potonganTerbuka = List(6) { false },
+                        potonganTerbuka = List(AturanPermainan.JUMLAH_UBIN_POTONGAN) { false },
                         poinPotonganTersisa = 100,
                         statusJawaban = StatusJawaban.BELUM
                     )
@@ -204,7 +214,7 @@ class KuisViewModel(
 
         if (index in tiles.indices && !tiles[index]) {
             tiles[index] = true
-            val poinBaru = (state.poinPotonganTersisa - 15).coerceAtLeast(20)
+            val poinBaru = poinSetelahBukaPotongan(state.poinPotonganTersisa)
             sfxPlayer.playClick()
             _uiState.update {
                 it.copy(potonganTerbuka = tiles, poinPotonganTersisa = poinBaru)
@@ -230,9 +240,14 @@ class KuisViewModel(
             sfxPlayer.playBenar()
             rewardJob = viewModelScope.launch {
                 if (repository.catatPenemuan(soal.idObjek)) {
-                    repository.dataStore.tambahKoin(20)
-                    repository.dataStore.tambahBintang(1)
-                    _uiState.update { it.copy(totalBintang = it.totalBintang + 1) }
+                    repository.dataStore.tambahKoin(AturanPermainan.KOIN_PER_TEMUAN)
+                    repository.dataStore.tambahBintang(AturanPermainan.BINTANG_PER_TEMUAN)
+                    _uiState.update {
+                        it.copy(
+                            totalBintang = it.totalBintang + 1,
+                            koinDidapat = it.koinDidapat + AturanPermainan.KOIN_PER_TEMUAN
+                        )
+                    }
                 }
             }
         } else {
@@ -253,6 +268,10 @@ class KuisViewModel(
                 }
                 setupSoalAktif()
             } else {
+                repository.dataStore.simpanSkorTerbaik(
+                    DataStoreManager.kunciSkor(state.habitatId, state.modeKuis),
+                    state.skorSesi
+                )
                 sfxPlayer.playBintang()
                 _uiState.update { it.copy(isKuisSelesai = true) }
             }

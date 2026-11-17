@@ -34,26 +34,6 @@ import com.example.sibeka.ui.kuis.components.*
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.AssetImageLoader
 
-private data class TeksMode(val judul: String, val instruksi: String, val hintBubble: String, val hintTombol: String)
-
-private fun teksMode(mode: ModeKuis) = when (mode) {
-    ModeKuis.SUSUN_HURUF -> TeksMode(
-        "Susun nama spesiesnya!", "Pilih huruf untuk mengisi kotak-kotak ini.",
-        "Ketuk huruf satu per satu sampai namanya lengkap. Salah pilih? Hapus huruf terakhir ya!",
-        "Susun huruf di atas"
-    )
-    ModeKuis.PASANGKAN -> TeksMode(
-        "Temukan pasangannya!", "Pilih satu kartu yang paling cocok.",
-        "Perhatikan gambarnya baik-baik, lalu pilih pasangan yang paling cocok.",
-        "Pilih pasangan di atas"
-    )
-    ModeKuis.POTONGAN_GAMBAR -> TeksMode(
-        "Buka sedikit, tebak cepat!", "Makhluk apakah yang bersembunyi ini?",
-        "Buka potongan satu per satu. Makin sedikit yang dibuka, makin banyak poinnya!",
-        "Pilih jawaban di atas"
-    )
-}
-
 private fun statusOpsi(opsi: ObjekEntity, ui: KuisUiState, soal: ObjekEntity): StatusOpsi {
     if (ui.statusJawaban == StatusJawaban.BELUM) return StatusOpsi.NETRAL
     return when {
@@ -68,6 +48,7 @@ fun KuisScreen(
     habitatId: String,
     modeKuis: ModeKuis,
     onKeluarKuis: () -> Unit,
+    onPilihModeLain: () -> Unit,
     viewModel: KuisViewModel = viewModel(factory = KuisViewModel.Factory())
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -82,8 +63,10 @@ fun KuisScreen(
             jawabanBenar = uiState.jawabanBenar,
             bintangDidapat = uiState.totalBintang,
             skorTotal = uiState.skorSesi,
+            koinDidapat = uiState.koinDidapat,
             totalSoal = uiState.daftarSoal.size,
             onMainLagi = { viewModel.mulaiKuis(habitatId, modeKuis) },
+            onPilihModeLain = onPilihModeLain,
             onKembaliKePeta = onKeluarKuis
         )
         return
@@ -124,7 +107,7 @@ fun KuisScreen(
 
     val currentSoal = viewModel.currentSoal ?: return
     val sudahJawab = uiState.statusJawaban != StatusJawaban.BELUM
-    val teks = teksMode(uiState.modeKuis)
+    val infoMode = uiState.modeKuis.info
     val soalTerakhir = uiState.currentSoalIndex + 1 >= uiState.daftarSoal.size
 
     // Teks "Jawabanmu" / "Jawaban benar" untuk kartu umpan balik
@@ -139,12 +122,16 @@ fun KuisScreen(
     Scaffold(
         containerColor = LatarKrem,
         topBar = {
-            KuisTopBar(namaHabitat = uiState.namaHabitat, totalKoin = totalKoin, onCloseClick = onKeluarKuis)
+            KuisTopBar(
+                label = "${infoMode.judul.uppercase()} · ${uiState.namaHabitat.uppercase()}",
+                totalKoin = totalKoin,
+                onCloseClick = onKeluarKuis
+            )
         },
         bottomBar = {
             KuisAksiBawah(
                 sudahMenjawab = sudahJawab,
-                teksHint = teks.hintTombol,
+                teksHint = infoMode.hintTombol,
                 teksLanjut = if (soalTerakhir) "Lihat hasil" else "Lanjut ke soal berikutnya",
                 onLanjutClick = { viewModel.lanjutKeSoalBerikutnya() }
             )
@@ -164,7 +151,7 @@ fun KuisScreen(
                 bintangTerkumpul = uiState.totalBintang
             )
 
-            KuisHeader(judul = teks.judul, instruksi = teks.instruksi)
+            KuisHeader(judul = infoMode.judulKuis, instruksi = infoMode.instruksi)
 
             when (uiState.modeKuis) {
                 ModeKuis.SUSUN_HURUF -> SusunHurufView(uiState, currentSoal, viewModel)
@@ -180,7 +167,7 @@ fun KuisScreen(
                     faktaUnik = currentSoal.faktaUnik
                 )
             } else {
-                BubbleSiBeka(teks.hintBubble)
+                BubbleSiBeka(infoMode.hintBubble)
             }
             Spacer(Modifier.height(4.dp))
         }

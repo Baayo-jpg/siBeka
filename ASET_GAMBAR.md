@@ -116,6 +116,22 @@ titiknya, lengkungan yang hilang maksimal 0,005 px — tidak terlihat. Hasilnya:
 Kalau nanti menambah SVG hasil trace baru, jalankan pemeriksaan yang sama:
 busur dengan radius ribuan kali ukuran kanvas adalah tanda perlu dibersihkan.
 
+### Setelah itu: semua aset habitat menjadi WebP
+
+SVG hasil trace sangat besar (1–2,7 MB per berkas) karena setiap helai daun dan
+bulu menjadi path sendiri. Seluruh 139 berkas flora, fauna, dan pasangan kini
+di-raster sekali pada lebar 1100 px (pasangan 700 px, karena tampil paling besar
+200–300 px) lalu disimpan sebagai WebP kualitas 84:
+
+- masuk **144,4 MB** → keluar **9,5 MB**;
+- `seed_data.json` memakai ekstensi `.webp`;
+- `SiBekaDatabaseHelper.DATABASE_VERSION = 8` menjalankan ulang
+  `updateImagePathsFromSeedData` agar instalasi lama ikut berpindah dari `.svg`
+  ke `.webp` (fungsi yang sama dipakai migrasi v3).
+
+Karena sudah diraster, menambah spesies baru cukup menyiapkan WebP; tidak perlu
+lagi membersihkan busur SVG. Berkas SVG aslinya tetap tersedia di riwayat git.
+
 ## 5. Asal dan pemrosesan aset
 
 File asli dari Canva berupa SVG yang isinya sebenarnya **gambar raster base64**
@@ -130,7 +146,42 @@ sebagai WebP:
 Hasilnya total ± 165 KB, dari 5,4 MB berkas SVG asli. File SVG aslinya tetap ada
 di `C:\Users\HP\Downloads\ikon\` (tidak diubah).
 
-## 6. Setelah menambah atau mengganti aset
+## 6. `assets/koin/` — ikon koin
+
+Bentuk koin dipakai menurut besar nilainya: satu koin untuk saldo kecil, tumpukan
+untuk ilustrasi hadiah.
+
+| File | Ukuran | Dipakai di |
+|---|---|---|
+| `koin.webp` | 140 × 149 | chip saldo bintang/koin di header (Peta, Koleksi, Toko, Level, Kuis) |
+| `koin_miring.webp` | 119 × 140 | label harga pada kartu aksesori Toko |
+| `koin_tumpuk3.webp` | 129 × 151 | catatan penutup halaman Toko |
+
+Ukuran tampil: 20 dp di `ChipKoin`, 17 dp di `ChipStatistik` (header Peta), dan
+16 dp di label harga Toko. Jangan turunkan di bawah 17 dp — koin ini render 3D
+dengan bintang timbul dan dua lapis rim, jadi di bawah ukuran itu bintangnya
+hilang dan tinggal bercak emas. Sisanya masih terbaca sebagai koin karena bentuk
+disc dan rimnya.
+
+Karena gambar 140 px diperkecil ke 17–20 dp (51–60 px di layar 3x), pemuatannya
+lewat composable `KoinKecil` di `SiBekaComponents.kt` yang memakai
+`filterQuality = FilterQuality.Medium` (mipmap). Filter bawaan `Low` membuat tepi
+rim bergerigi saat diperkecil lebih dari 2x.
+
+Asal: SVG ekspor Canva yang di dalamnya hanya ada dua PNG tersemat — mask abu-abu
+dan artwork berwarna. Mask dipakai sebagai kanal alpha, artwork sebagai warna,
+lalu dipotong ke isi dan disimpan sebagai **WebP lossless** (total ± 62 KB).
+Lossy sempat dipakai, tetapi tepi rim jadi sedikit melebar di ukuran chip;
+lossless tidak menambah banyak karena gambarnya kecil. SVG aslinya tidak disalin
+ke proyek karena isinya hanya pembungkus raster itu.
+
+Dua varian dari desainer tidak dipakai dan sudah dihapus dari `assets/koin/`:
+tumpukan dua koin (105 × 111) dan tumpukan empat koin (139 × 184). Keduanya
+hanya berguna untuk animasi hadiah koin setelah kuis, sedangkan layar Hasil saat
+ini tidak menerima data koin per sesi — menampilkannya berarti menambah state dan
+UI baru. Berkas aslinya tetap ada di lampiran percakapan bila nanti dibutuhkan.
+
+## 7. Setelah menambah atau mengganti aset
 
 ```
 ./gradlew :app:assembleDebug --offline

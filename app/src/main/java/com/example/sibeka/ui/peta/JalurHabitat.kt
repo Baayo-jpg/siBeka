@@ -35,9 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.sibeka.data.model.namaTampilHabitat
 import com.example.sibeka.ui.components.PillLabel
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.GambarAset
@@ -80,16 +86,6 @@ private val RUANG_BAWAH = 30.dp
 
 /** Posisi horizontal simpul (fraksi lebar layar) agar jalur berkelok seperti halaman utama Duolingo. */
 private val FRAKSI_X = listOf(0.5f, 0.74f, 0.5f, 0.26f)
-
-/** Format nama resmi habitat untuk header & pemisah jalur. */
-fun namaTampilHabitat(habitatId: String, defaultNama: String = ""): String = when (habitatId) {
-    "GN" -> "Gunung"
-    "HH" -> "Hutan Hujan Tropis"
-    "RW" -> "Rawa"
-    "SG" -> "Sungai"
-    "LT" -> "Lautan"
-    else -> defaultNama.ifBlank { "Habitat" }
-}
 
 /**
  * Garis pemisah antar habitat dengan teks nama habitat di tengah (gaya Duolingo).
@@ -246,7 +242,8 @@ fun BannerHabitat(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = warnaTeksUtama,
-                            maxLines = 1
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -431,6 +428,13 @@ private fun SimpulLingkaran(item: SimpulBelajar, warna: Color, idHabitat: String
 
     val terisi = item.selesai || item.aktif
 
+    // Label untuk TalkBack: tanpa teks di dalam simpul, pembaca layar hanya
+    // menyebut "tombol" tanpa nama.
+    val labelAksesibilitas = remember(item, idHabitat) {
+        val status = if (item.selesai) "selesai" else "belum selesai"
+        "${item.judul}, habitat ${namaTampilHabitat(idHabitat)}, $status"
+    }
+
     val kandidatIkon = remember(item, idHabitat) { kandidatAsetSimpul(item, idHabitat) }
     val adaIkon = remember(kandidatIkon) { kandidatIkon.any { cariAsetPermainan(it) != null } }
 
@@ -462,6 +466,10 @@ private fun SimpulLingkaran(item: SimpulBelajar, warna: Color, idHabitat: String
                         Modifier
                     }
                 )
+                .semantics {
+                    contentDescription = labelAksesibilitas
+                    role = Role.Button
+                }
                 .clickable(interactionSource = interaksi, indication = null, onClick = onClick),
             contentAlignment = Alignment.Center
         ) {

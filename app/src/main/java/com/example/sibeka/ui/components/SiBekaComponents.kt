@@ -24,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sibeka.ui.theme.*
@@ -88,6 +90,26 @@ fun PillLabel(
 }
 
 // ── Chip koin & bintang ─────────────────────────────────────────────────────
+/**
+ * Koin emas untuk ukuran kecil (chip & harga). Memakai filter mipmap supaya
+ * tepi rim tetap tajam saat gambar 140 px diperkecil ke belasan dp.
+ */
+@Composable
+fun KoinKecil(
+    ukuran: Dp,
+    ukuranCadangan: TextUnit = 13.sp,
+    modifier: Modifier = Modifier,
+    nama: String = "koin"
+) {
+    GambarAset(
+        nama = nama,
+        cadangan = "🪙",
+        modifier = modifier.size(ukuran),
+        ukuranCadangan = ukuranCadangan,
+        folder = "koin",
+        filterQuality = FilterQuality.Medium
+    )
+}
 @Composable
 private fun ChipPil(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
     Surface(modifier, shape = RoundedCornerShape(50), color = PutihBersih, border = BorderStroke(1.dp, GarisKartu)) {
@@ -102,9 +124,7 @@ private fun ChipPil(modifier: Modifier, content: @Composable RowScope.() -> Unit
 
 @Composable
 fun ChipKoin(jumlah: Int, modifier: Modifier = Modifier) = ChipPil(modifier) {
-    Box(Modifier.size(18.dp).clip(CircleShape).background(KuningBintang), contentAlignment = Alignment.Center) {
-        Text("J", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = CoklatTua)
-    }
+    KoinKecil(ukuran = 20.dp, ukuranCadangan = 14.sp)
     Text("$jumlah", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
 }
 
@@ -126,15 +146,10 @@ fun ChipStatistik(bintang: Int, koin: Int, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Icon(Icons.Default.Star, null, tint = KuningBintang, modifier = Modifier.size(14.dp))
+            Icon(Icons.Default.Star, null, tint = KuningBintang, modifier = Modifier.size(20.dp))
             Text("$bintang", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
             Box(Modifier.padding(horizontal = 2.dp).width(1.dp).height(11.dp).background(GarisKartu))
-            Box(
-                Modifier.size(15.dp).clip(CircleShape).background(KuningBintang),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("J", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = CoklatTua)
-            }
+            KoinKecil(ukuran = 20.dp, ukuranCadangan = 14.sp)
             Text("$koin", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HitamLembut)
         }
     }
@@ -148,11 +163,15 @@ fun ChipStatistik(bintang: Int, koin: Int, modifier: Modifier = Modifier) {
  * Tanpa [judul] yang dipakai adalah label "JELAJAH ALAM". Di layar yang punya
  * judul sendiri (Koleksi, Toko), isi [judul] dan [subjudul] supaya judul layar
  * menempati posisi header ini, bukan tampil lagi di dalam konten.
+ *
+ * [aksiSubjudul] dipakai untuk aksi kecil di ujung kanan baris subjudul (mis.
+ * tombol Opsi di Toko) supaya baris judul tetap lega untuk chip statistik.
  */
 fun HeaderJelajahAlam(
     modifier: Modifier = Modifier,
     judul: String? = null,
     subjudul: String? = null,
+    aksiSubjudul: (@Composable () -> Unit)? = null,
     trailing: @Composable RowScope.() -> Unit = {}
 ) {
     Column(
@@ -179,7 +198,17 @@ fun HeaderJelajahAlam(
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), content = trailing)
         }
         if (judul != null && subjudul != null) {
-            Text(subjudul, fontSize = 12.sp, color = AbuTua)
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    subjudul, fontSize = 12.sp, color = AbuTua,
+                    modifier = Modifier.weight(1f)
+                )
+                aksiSubjudul?.invoke()
+            }
         }
     }
 }

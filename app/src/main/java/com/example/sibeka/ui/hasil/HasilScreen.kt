@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Map
@@ -34,7 +35,9 @@ fun HasilScreen(
     skorTotal: Int,
     onMainLagi: () -> Unit,
     onKembaliKePeta: () -> Unit,
-    totalSoal: Int = 5
+    totalSoal: Int = 5,
+    koinDidapat: Int = 0,
+    onPilihModeLain: (() -> Unit)? = null
 ) {
     val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
 
@@ -75,9 +78,57 @@ fun HasilScreen(
             KartuStat("$skorTotal", "Skor sesi (poin)", KuningMuda, CoklatTua, KuningMuda, Modifier.weight(1f))
         }
 
+        // Rincian hadiah sesi + aturan kapan koin benar-benar bertambah.
+        KartuSiBeka(
+            Modifier.fillMaxWidth(),
+            container = KuningMuda,
+            borderColor = KuningMuda,
+            shape = RoundedCornerShape(18.dp)
+        ) {
+            Column(
+                Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    KoinKecil(ukuran = 20.dp)
+                    Text(
+                        "Hadiah sesi ini",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = CoklatTua,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        if (koinDidapat > 0) "+$koinDidapat koin" else "Tidak ada koin baru",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = CoklatTua
+                    )
+                }
+                Text(
+                    "Koin dan bintang hanya diberikan untuk spesies yang baru pertama kali ditemukan. " +
+                        "Mengulang spesies yang sama tetap menambah skor, tetapi tidak menambah koin.",
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp,
+                    color = CoklatTua.copy(alpha = 0.80f)
+                )
+            }
+        }
+
         Spacer(Modifier.height(4.dp))
 
         TombolUtama("Mainkan lagi", onClick = { sfxPlayer.playClick(); onMainLagi() }, icon = Icons.Outlined.Refresh)
+        if (onPilihModeLain != null) {
+            TombolSekunder(
+                "Coba mode lain",
+                onClick = { sfxPlayer.playClick(); onPilihModeLain() },
+                icon = Icons.AutoMirrored.Outlined.ArrowForward
+            )
+        }
         TombolSekunder("Kembali ke peta", onClick = { sfxPlayer.playClick(); onKembaliKePeta() }, icon = Icons.Outlined.Map)
     }
 }

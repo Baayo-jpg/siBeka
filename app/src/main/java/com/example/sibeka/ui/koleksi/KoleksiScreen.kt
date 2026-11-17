@@ -35,61 +35,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.sibeka.SiBekaApp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sibeka.data.db.ObjekEntity
 import com.example.sibeka.ui.components.*
-import com.example.sibeka.ui.peta.URUTAN_HABITAT
 import com.example.sibeka.ui.theme.*
 import com.example.sibeka.util.AssetImageLoader
 
 @Composable
 fun KoleksiScreen(
     onBukaPeta: () -> Unit,
-    onBukaToko: () -> Unit
+    onBukaToko: () -> Unit,
+    filterAwal: String = FILTER_SEMUA_HABITAT
 ) {
-    val repository = SiBekaApp.instance.container.repository
-    val dataStore = repository.dataStore
-    val sfxPlayer = SiBekaApp.instance.container.sfxPlayer
+    val viewModel: KoleksiViewModel = viewModel(factory = KoleksiViewModel.Factory())
+    val ui by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val habitats by repository.getAllHabitats().collectAsState(initial = emptyList())
-    val habitatTerurut = remember(habitats) {
-        habitats.sortedBy { h -> URUTAN_HABITAT.indexOf(h.id).let { if (it < 0) URUTAN_HABITAT.size else it } }
-    }
-    val koleksiList by repository.getAllKoleksi().collectAsState(initial = emptyList())
-    val collectedIds = remember(koleksiList) { koleksiList.map { it.idObjek }.toSet() }
-    val totalKoin by dataStore.totalKoin.collectAsState(initial = 100)
-    val totalBintang by dataStore.totalBintang.collectAsState(initial = 0)
+    // Peta bisa membuka koleksi yang sudah terfilter ke habitat tertentu.
+    LaunchedEffect(filterAwal) { viewModel.pilihFilter(filterAwal) }
 
-    var selectedHabitatId by remember { mutableStateOf("SEMUA") }
-    var allObjek by remember { mutableStateOf<List<ObjekEntity>>(emptyList()) }
-    var selectedObjek by remember { mutableStateOf<ObjekEntity?>(null) }
+    BackHandler(enabled = ui.objekTerpilih != null) { viewModel.tutupDetail(putarSuara = false) }
 
-    LaunchedEffect(Unit) {
-        allObjek = repository.getAllObjek()
-    }
-
-    val filteredObjek = remember(selectedHabitatId, allObjek) {
-        if (selectedHabitatId == "SEMUA") allObjek else allObjek.filter { it.idHabitat == selectedHabitatId }
-    }
-    val namaHabitatDari = { id: String -> habitats.firstOrNull { it.id == id }?.namaHabitat ?: "" }
-
-    BackHandler(enabled = selectedObjek != null) { selectedObjek = null }
-
-    val detail = selectedObjek
+    val detail = ui.objekTerpilih
     if (detail != null) {
         DetailKoleksi(
             objek = detail,
-            namaHabitat = namaHabitatDari(detail.idHabitat),
-            totalKoin = totalKoin,
-            totalBintang = totalBintang,
-            onKembali = { sfxPlayer.playClick(); selectedObjek = null }
+            namaHabitat = ui.namaHabitat(detail.idHabitat),
+            totalKoin = ui.totalKoin,
+            totalBintang = ui.totalBintang,
+            onKembali = { viewModel.tutupDetail() }
         )
         return
     }
-
-    val total = allObjek.size.coerceAtLeast(1)
-    val ditemukan = allObjek.count { it.idObjek in collectedIds }
-    val persen = ditemukan * 100 / total
 
     Scaffold(
         containerColor = LatarKrem,
@@ -97,14 +74,14 @@ fun KoleksiScreen(
             HeaderJelajahAlam(
                 judul = "Buku Koleksiku",
                 subjudul = "Setiap penemuan punya cerita."
-            ) { ChipBintang(totalBintang); ChipKoin(totalKoin) }
+            ) { ChipBintang(ui.totalBintang); ChipKoin(ui.totalKoin) }
         },
         bottomBar = {
             SiBekaBottomBar(
                 terpilih = TabUtama.KOLEKSI,
-                onPeta = { sfxPlayer.playClick(); onBukaPeta() },
+                onPeta = { viewModel.klik(); onBukaPeta() },
                 onKoleksi = {},
-                onToko = { sfxPlayer.playClick(); onBukaToko() }
+                onToko = { viewModel.klik(); onBukaToko() }
             )
         }
     ) { innerPadding ->
@@ -119,11 +96,11 @@ fun KoleksiScreen(
                 KartuSiBeka(Modifier.fillMaxWidth(), container = HijauBenarMuda, borderColor = HijauBenarMuda, shape = RoundedCornerShape(18.dp)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("$ditemukan dari $total spesies ditemukan", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
-                            Text("$persen%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                            Text("${ui.ditemukan} dari ${ui.totalSpesies} spesies ditemukan", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
+                            Text("${ui.persen}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = HijauTua)
                         }
                         Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(PutihBersih.copy(alpha = 0.7f))) {
-                            Box(Modifier.fillMaxWidth(persen / 100f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(HijauTua))
+                            Box(Modifier.fillMaxWidth(ui.persen / 100f).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(HijauTua))
                         }
                     }
                 }
@@ -131,23 +108,23 @@ fun KoleksiScreen(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     item {
-                        ChipFilter("Semua · $ditemukan", selectedHabitatId == "SEMUA") { selectedHabitatId = "SEMUA" }
+                        ChipFilter("Semua · ${ui.ditemukan}", ui.filterHabitatId == FILTER_SEMUA_HABITAT) {
+                            viewModel.pilihFilter(FILTER_SEMUA_HABITAT)
+                        }
                     }
-                    items(habitatTerurut) { h ->
-                        val n = allObjek.count { it.idHabitat == h.id && it.idObjek in collectedIds }
-                        ChipFilter("${h.namaHabitat} · $n", selectedHabitatId == h.id) { selectedHabitatId = h.id }
+                    items(ui.habitatTerurut) { h ->
+                        val n = ui.jumlahDitemukan(h.id)
+                        ChipFilter("${h.namaHabitat} · $n", ui.filterHabitatId == h.id) { viewModel.pilihFilter(h.id) }
                     }
                 }
             }
-            items(filteredObjek) { item ->
-                val terbuka = collectedIds.contains(item.idObjek)
+            items(ui.objekTampil) { item ->
+                val terbuka = ui.collectedIds.contains(item.idObjek)
                 KoleksiGridItem(
                     objek = item,
-                    namaHabitat = namaHabitatDari(item.idHabitat),
+                    namaHabitat = ui.namaHabitat(item.idHabitat),
                     terbuka = terbuka,
-                    onClick = {
-                        if (terbuka) { sfxPlayer.playClick(); selectedObjek = item } else sfxPlayer.playSalah()
-                    }
+                    onClick = { viewModel.bukaDetail(item, terbuka) }
                 )
             }
         }
@@ -192,7 +169,23 @@ fun KoleksiGridItem(objek: ObjekEntity, namaHabitat: String, terbuka: Boolean, o
                         contentScale = ContentScale.Fit
                     )
                 } else {
-                    Icon(Icons.Default.Lock, "Terkunci", tint = AbuSedang, modifier = Modifier.size(30.dp))
+                    // Siluet: bentuk spesies tampil gelap tanpa detail supaya tetap rahasia.
+                    AsyncImage(
+                        model = AssetImageLoader.buildAssetRequest(context, objek.gambarUtamaPath, 240, 240),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize().padding(4.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    Box(
+                        Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
+                            .background(HijauTua.copy(alpha = 0.88f))
+                    )
+                    Box(
+                        Modifier.size(30.dp).clip(CircleShape).background(PutihBersih.copy(alpha = 0.92f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Lock, null, tint = HijauTua, modifier = Modifier.size(16.dp))
+                    }
                 }
             }
             Column(Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
