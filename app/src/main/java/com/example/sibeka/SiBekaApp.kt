@@ -1,7 +1,6 @@
 package com.example.sibeka
 
 import android.app.Application
-import app.rive.runtime.kotlin.core.Rive
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.example.sibeka.di.AppContainer
@@ -19,8 +18,6 @@ class SiBekaApp : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        // Inisialisasi native library Rive (wajib sebelum RiveAnimationView dipakai).
-        Rive.init(this)
         instance = this
         container = AppContainer(this)
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
